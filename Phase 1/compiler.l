@@ -1,6 +1,8 @@
 /* Part 1 : Definitions */
 %{
     #include "y.tab.h"
+    #include "compiler.h"
+    #include <stdio.h>
     #include <stdlib.h>
     void yyerror(char *);
 %}
@@ -82,5 +84,8 @@ not sure yet bas i think it will go something like this
 %%
 /* End of Production Rules */
 
+int yywrap(void) {
+    return 1;
+}
 
 /* Part 3 : Functions and Main*/
