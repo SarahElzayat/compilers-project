@@ -3,6 +3,13 @@
     #include <stdio.h>
     #include "compiler.h"
     #include <stdbool.h>
+
+    Node *get_Constant_Node(int, int, ...);                 /*creating a Node for a constant*/
+    Node *get_Operation_Node(int op, int nops, ...);        /*creating a Node for an operation*/
+    Node *get_Identifier_Node(char*, int = -1, int = -1);   /*creating a Node for an identifier Variable*/
+    
+    void freeNode(Node *p);                                 /*freeing the memory allocated to a Node*/
+
     int yylex(void);
     void yyerror(const char *);
 %}
@@ -13,11 +20,12 @@
 /* Part 2 : Unions */
 %union
 {
-    int i;
-    float f;
-    char c;
-    /* bool b; */
-    char *s;
+    int i;              /* integer */
+    float f;            /* integer */
+    char c;             /* char */
+    /* bool b; */       /* boolean */
+    char *s;            /* string */
+    Node *nPtr;         /* Node pointer */
 }
 
 /* End of Unions */
