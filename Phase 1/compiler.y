@@ -1,8 +1,10 @@
 /* Part 1 : Definitions */
 %{
     #include <stdio.h>
+    #include "compiler.h"
+    #include <stdbool.h>
     int yylex(void);
-    void yyerror(char *);
+    void yyerror(const char *);
 %}
 /* End of Definitions */
 
@@ -14,7 +16,7 @@
     int i;
     float f;
     char c;
-    bool b;
+    /* bool b; */
     char *s;
 }
 
@@ -61,7 +63,7 @@ Keyword     Description
 %right '='
 /* %left OR
 %left AND
-%left GREATER_EQUAL LESS_EQUAL EQUAL NOTEQUAL GREATER LESS */
+%left GREATER_EQUAL LESS_EQUAL EQUAL NOTEQUAL */
 %left '+' '-'
 %left '*' '/'
 /* %right NOT */
@@ -77,7 +79,6 @@ Keyword     Description
 /* Part 4 : Production Rules */
 %%
 
-/* Starting Rules */
 program : statement_list
         ;
 
@@ -88,7 +89,6 @@ statement : simple_statement
           | compound_statement
           ;
 
-/* General Rules */
 simple_statement : assignment_statement
                  | return_statement 
                  | print_statement
@@ -99,10 +99,6 @@ compound_statement :
                   ;
 
 
-
-/* Simple Statements */
-
-/* Variables and Constants declaration.  */
 assignment_statement : VARIABLE '=' expression
                      | CONSTANT '=' expression
                      ;
@@ -117,43 +113,21 @@ print_statement : PRINT expression
 function_call : FUNCTION '(' expression ')'
             ;
 
-expression : expression '+' expression  { $$ = $1 + $3;}
-           | expression '-' expression  { $$ = $1 - $3;}
-           | expression '*' expression  { $$ = $1 * $3;}
-           | expression '/' expression  { $$ = $1 / $3;}
-           /* | expression OR expression   { $$ = $1 || $3;}
-           | expression AND expression  { $$ = $1 && $3;}
-           | expression GREATER_EQUAL expression { $$ = $1 >= $3;}
-           | expression LESS_EQUAL expression { $$ = $1 <= $3;}
-           | expression EQUAL expression { $$ = $1 == $3;}
-           | expression NOTEQUAL expression { $$ = $1 != $3;}
-           | expression GREATER expression { $$ = $1 > $3;}
-           | expression LESS expression { $$ = $1 < $3;}
-           | NOT expression             {!$2;} */
-           | '(' expression ')'         { $$ = $2;}
-           /* | function_call              {;} */
-           /* | VARIABLE                   { $$ = $1;} */
-           /* | CONSTANT                   { $$ = $1;} */
-           | INTEGER                    { $$ = $1;}
-           /* | FLOAT                      { $$ = $1;} */
-           /* | CHAR                       { $$ = $1;} */
-           /* | BOOL                       { $$ = $1;} */
-           /* | STRING                     { $$ = $1;} */
+expression : expression '+' expression 
+           | expression '-' expression 
+           | expression '*' expression 
+           | expression '/' expression 
+           | '(' expression ')'        
+           | INTEGER                   
+           | VARIABLE                  
+           | CONSTANT                  
            ;
-
-/* Compound Statements */
 
 %%
 /* End of Production Rules */
 
 
 /* Part 5 : Functions and Main */
-void yyerror(char *s)
-{
-    fprintf(stderr, "%s\n", s);
-    exit(1);
-}
-
 int main(void)
 {
     yyparse();

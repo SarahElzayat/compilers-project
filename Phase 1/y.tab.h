@@ -63,12 +63,12 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 13 "compiler.y"
+#line 15 "compiler.y"
 
     int i;
     float f;
     char c;
-    bool b;
+    /* bool b; */
     char *s;
 
 
