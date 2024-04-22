@@ -34,42 +34,41 @@ Keyword     Description
 
 
 /* Terminal names */
-%token VARIABLE
-%token CONSTANT
+%token <s> VARIABLE
+%token <s> CONSTANT
 
 /* Data types */
 %token <i> INTEGER
-%token <f> FLOAT
+/* %token <f> FLOAT
 %token <c> CHAR
 %token <b> BOOL
-%token <s> STRING
+%token <s> STRING */
 
 /* Keywords */
-%token IF ELSE ELIF /* Keywords for if statement */
-%token SWITCH CASE DEFAULT /* Keywords for switch case statement */
-%token FOR WHILE DO BREAK CONTINUE /* Keywords for loops */
-%token CONST INT_TYPE FLOAT_TYPE BOOL_TYPE CHAR_TYPE /* Keywords for data types */
+/* %token IF ELSE ELIF Keywords for if statement */
+/* %token SWITCH CASE DEFAULT Keywords for switch case statement */
+/* %token FOR WHILE DO BREAK CONTINUE Keywords for loops */
+/* %token CONST INT_TYPE FLOAT_TYPE BOOL_TYPE CHAR_TYPE Keywords for data types */
 %token RETURN /* Keyword for return statement */
 %token FUNCTION /* Keyword for function declaration */
 %token PRINT /* Keyword for print */
-%token TRUE FALSE /* Keywords for boolean values */
+/* %token TRUE FALSE Keywords for boolean values */
 
 /* Operators */
 /* The order matters as we go down the precedence of the operator increases */
 /* left and right keywords gove  */
 
 %right '='
-%left OR
+/* %left OR
 %left AND
-%left GREATER_EQUAL LESS_EQUAL EQUAL NOTEQUAL GREATER LESS
+%left GREATER_EQUAL LESS_EQUAL EQUAL NOTEQUAL GREATER LESS */
 %left '+' '-'
 %left '*' '/'
-%right NOT
+/* %right NOT */
 
 
 /* Non Terminal Types */
 %type <i> expression
-
  
 
 /* End of Tokens */
@@ -77,25 +76,72 @@ Keyword     Description
 
 /* Part 4 : Production Rules */
 %%
-/* Example */
-declaration: VARIABLE '=' expression
-            | VARIABLE '=' CONSTANT
+
+/* Starting Rules */
+program : statement_list
+        ;
+
+statement_list : statement
+               ;
+
+statement : simple_statement
+          | compound_statement
+          ;
+
+/* General Rules */
+simple_statement : assignment_statement
+                 | return_statement 
+                 | print_statement
+                 | function_call
+                 ;
+
+compound_statement : 
+                  ;
+
+
+
+/* Simple Statements */
+
+/* Variables and Constants declaration.  */
+assignment_statement : VARIABLE '=' expression
+                     | CONSTANT '=' expression
+                     ;
+
+return_statement : RETURN expression
+                 | RETURN
+                 ;
+
+print_statement : PRINT expression
+                ;          
+
+function_call : FUNCTION '(' expression ')'
             ;
 
-expression: expression '+' expression
-            | expression '-' expression
-            | expression '*' expression
-            | expression '/' expression
-            | '(' expression ')'
-            | CONSTANT
-            | INTEGER
-            | FLOAT
-            | CHAR
-            | BOOL
-            | VARIABLE
-            | STRING
-            ;
+expression : expression '+' expression  { $$ = $1 + $3;}
+           | expression '-' expression  { $$ = $1 - $3;}
+           | expression '*' expression  { $$ = $1 * $3;}
+           | expression '/' expression  { $$ = $1 / $3;}
+           /* | expression OR expression   { $$ = $1 || $3;}
+           | expression AND expression  { $$ = $1 && $3;}
+           | expression GREATER_EQUAL expression { $$ = $1 >= $3;}
+           | expression LESS_EQUAL expression { $$ = $1 <= $3;}
+           | expression EQUAL expression { $$ = $1 == $3;}
+           | expression NOTEQUAL expression { $$ = $1 != $3;}
+           | expression GREATER expression { $$ = $1 > $3;}
+           | expression LESS expression { $$ = $1 < $3;}
+           | NOT expression             {!$2;} */
+           | '(' expression ')'         { $$ = $2;}
+           /* | function_call              {;} */
+           /* | VARIABLE                   { $$ = $1;} */
+           /* | CONSTANT                   { $$ = $1;} */
+           | INTEGER                    { $$ = $1;}
+           /* | FLOAT                      { $$ = $1;} */
+           /* | CHAR                       { $$ = $1;} */
+           /* | BOOL                       { $$ = $1;} */
+           /* | STRING                     { $$ = $1;} */
+           ;
 
+/* Compound Statements */
 
 %%
 /* End of Production Rules */
