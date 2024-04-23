@@ -1,0 +1,9 @@
+ expression ',' expression  #hal da sah?   
+FOR '(' declaration_statement ';' expression ';' assignment_statement ')' statement #awl wahda momkn tb2a assignment kaman
+ CASE BOOL ':' statement cases
+
+     Node *get_Constant_Node(int, int, ...);                 /*creating a Node for a constant*/
+    Node *get_Operation_Node(int op, int nops, ...);        /*creating a Node for an operation*/
+    Node *get_Identifier_Node(char*, int = -1, int = -1);   /*creating a Node for an identifier Variable*/
+    
+    void freeNode(Node *p);                                 /*freeing the memory allocated to a Node*/

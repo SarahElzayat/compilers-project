@@ -1,7 +1,8 @@
 /* Add Types Here*/
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+
 
 typedef enum
 {
@@ -26,6 +27,7 @@ typedef struct
 typedef struct
 {
     valueType value; /* value of constant */
+    char *name;      /* name of constant */
     int type;        /* type of constant */
 } constantNode;
 

@@ -39,21 +39,79 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     VARIABLE = 258,
-     CONSTANT = 259,
-     INTEGER = 260,
-     RETURN = 261,
-     FUNCTION = 262,
-     PRINT = 263
+     INTEGER = 258,
+     FLOAT = 259,
+     CHAR = 260,
+     BOOL = 261,
+     STRING = 262,
+     VARIABLE = 263,
+     CONSTANT = 264,
+     IF = 265,
+     SWITCH = 266,
+     CASE = 267,
+     DEFAULT = 268,
+     FOR = 269,
+     WHILE = 270,
+     DO = 271,
+     BREAK = 272,
+     CONTINUE = 273,
+     CONST = 274,
+     INT_TYPE = 275,
+     FLOAT_TYPE = 276,
+     BOOL_TYPE = 277,
+     CHAR_TYPE = 278,
+     STRING_TYPE = 279,
+     FUNCTION = 280,
+     PRINT = 281,
+     RETURN = 282,
+     IFX = 283,
+     ELSE = 284,
+     ENDLINE = 285,
+     OR = 286,
+     AND = 287,
+     NOTEQUAL = 288,
+     EQUAL = 289,
+     LESS_EQUAL = 290,
+     GREATER_EQUAL = 291,
+     NOT = 292
    };
 #endif
 /* Tokens.  */
-#define VARIABLE 258
-#define CONSTANT 259
-#define INTEGER 260
-#define RETURN 261
-#define FUNCTION 262
-#define PRINT 263
+#define INTEGER 258
+#define FLOAT 259
+#define CHAR 260
+#define BOOL 261
+#define STRING 262
+#define VARIABLE 263
+#define CONSTANT 264
+#define IF 265
+#define SWITCH 266
+#define CASE 267
+#define DEFAULT 268
+#define FOR 269
+#define WHILE 270
+#define DO 271
+#define BREAK 272
+#define CONTINUE 273
+#define CONST 274
+#define INT_TYPE 275
+#define FLOAT_TYPE 276
+#define BOOL_TYPE 277
+#define CHAR_TYPE 278
+#define STRING_TYPE 279
+#define FUNCTION 280
+#define PRINT 281
+#define RETURN 282
+#define IFX 283
+#define ELSE 284
+#define ENDLINE 285
+#define OR 286
+#define AND 287
+#define NOTEQUAL 288
+#define EQUAL 289
+#define LESS_EQUAL 290
+#define GREATER_EQUAL 291
+#define NOT 292
 
 
 
@@ -63,18 +121,18 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 15 "compiler.y"
+#line 16 "parser.y"
 
-    int i;
-    float f;
-    char c;
-    /* bool b; */
-    char *s;
+    int i;              /* integer */
+    float f;            /* integer */
+    char c;             /* char */
+    int b;           /*  boolean */
+    char *s;            /* string */
 
 
 
 /* Line 1676 of yacc.c  */
-#line 78 "y.tab.h"
+#line 136 "y.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
