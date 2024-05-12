@@ -1,5 +1,10 @@
 {
   "files.associations": {
-    "stdbool.h": "c"
+    "*.ejs": "html",
+    "stdbool.h": "c",
+    "type_traits": "c",
+    "map": "c",
+    "system_error": "c",
+    "xlocale": "c"
   }
 }
