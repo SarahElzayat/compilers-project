@@ -11,11 +11,13 @@ using std::string;
 using std::vector;
 using std::map;
 
+#define SIZEOF_NODETYPE ((char *)&p->con - (char *)p) /* size of largest type, in bytes */
+
 typedef enum
 {
-    Constant,
-    Id,
-    Op
+    CONSTANT,
+    ID,
+    OP
 } nodeType;
 
 typedef struct
@@ -35,14 +37,15 @@ typedef struct
 {
     valueType value; /* value of constant */
     char *name;      /* name of constant */
-    int type;        /* type of constant */
+    int dataType;        /* type of constant */
+    int qualifier;       /* qualifier of constant */
 } constantNode;
 
 /* variables */
 typedef struct
 {
     char *name; /* name of variable */
-    int type;   /* type of id */
+    int dataType;   /* type of id */
 } idNode;
 
 /* operators */

@@ -24,8 +24,10 @@
     int i;              /*   integer  */
     float f;            /*   integer  */
     char c;             /*   char     */
-    int b;              /*   boolean  */
+    bool b;              /*   boolean  */
     char *s;            /*   string   */
+    char *v;            /*   variable type */
+    char *sIdx;           /*   symbol table */
     node *n;            /*   node     */
 }
 
@@ -53,8 +55,9 @@ Keyword     Description
 %token <c> CHAR
 %token <b> BOOL
 %token <s> STRING
+%token <sIdx> VARIABLE
 
-%token <s> VARIABLE
+/* %token <s> VARIABLE */
 %token <s> CONSTANT
 /* Keywords */
 %token IF                                                 /* Keywords for if statement */
@@ -81,6 +84,7 @@ Keyword     Description
 
 
 /* Non Terminal Types */
+%type <n> program
 
 /* End of Tokens */
 
@@ -195,8 +199,91 @@ expression : expression '+' expression
 
 
 /* Part 5 : Functions and Main */
+node *construct_constant_node(int type, int dataType, ...) {
+    va_list ap; /* variable argument list */
+    node *p;
+    size_t nodeSize;
+
+    /* allocate Node */
+    nodeSize = SIZEOF_NODETYPE + sizeof(constantNode);
+    if ((p = (Node*)malloc(nodeSize)) == NULL)
+    {
+        yyerror("out of memory");
+    }
+
+    /* copy information */
+    p->type = CONSTANT;
+    p->con.dataType = dataType;
+    va_start(ap, dataType); /* initialize va */
+    p->con.value = va_arg(ap, valType); /* get value */
+    va_end(ap); /* clean up va */
+
+    return p;
+}
+
+node *construct_op_node(int oper, int nOpers, ...) {
+  va_list ap; /* variable argument list */
+  node *p;
+  size_t nodeSize;
+  int i = 0;
+  
+  /* allocate Node */
+  nodeSize = SIZEOF_NODETYPE + sizeof(opNode) +
+    (nOpers - 1) * sizeof(node*);
+  if ((p = (Node*)malloc(nodeSize)) == NULL)
+  {
+    yyerror("out of memory");
+  }
+    
+
+  /* copy information */
+  p->type = OP;
+  p->opr.oper = oper;
+  p->opr.nops = nOpers;
+
+  va_start(ap, nOpers);
+  for (i = 0; i < nOpers; i++)
+  {
+    p->opr.op[i] = va_arg(ap, node*);
+  }
+  va_end(ap);
+  return p;
+}
+
+node *construct_id_node(char* i, int dataType, int qualifier) {
+  node *p;
+  size_t nodeSize;
+  /* allocate Node */
+  nodeSize = SIZEOF_NODETYPE + sizeof(idNode);
+  if ((p = (node*)malloc(nodeSize)) == NULL)
+    yyerror("out of memory");
+
+  /* copy information */
+  p->type = ID;
+  p->id.name = strdup(i);
+  p->id.dataType = dataType;
+  p->id.qualifier = qualifier;
+  return p;
+}
+
+void free_node(node *p) {
+  int i;
+
+  if (!p) /* nothing to free */
+  {
+    return; 
+  }
+  if (p->type == OP) /* free sub-nodes */
+  {
+    for (i = 0; i < p->opr.nops; i++)
+      free_node(p->opr.op[i]);
+  }
+  free (p);
+}
+
 int main(void)
 {
     yyparse();
+    export_symbol_table();
     return 0;
 }
