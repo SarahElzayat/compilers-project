@@ -46,6 +46,7 @@ typedef struct
 {
     char *name; /* name of variable */
     int dataType;   /* type of id */
+    int qualifier;  /* qualifier of id */
 } idNode;
 
 /* operators */

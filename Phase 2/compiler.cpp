@@ -23,6 +23,12 @@ const char* get_data_type(int type){
         case BOOL:
         case BOOL_TYPE:
             return "bool";
+        case CHAR:
+        case CHAR_TYPE:
+            return "char";
+        case STRING:
+        case STRING_TYPE:
+            return "string";
         default:
             return "";
     }
@@ -70,25 +76,91 @@ void export_symbol_table(){
     return;
 }
 
-symbolTable* declare_identifier(node* p, bool isRHS = false) {
-    return;
-}
-
 symbolTable* get_identifier(node* p, bool isRHS = false) {
-    return;    
+    if (p->type != ID) /*Not an identifier*/
+    {
+        return NULL;
+    }
+    else if (p->id.dataType == -1) /*Data type not set*/
+    {
+        return NULL;
+    }
+    
+    for (int i = level; i >= 0; i--) //Search in the current and all parent scopes for assignment RHS
+    { 
+        //Check if the identifier is in the symbol table
+        if (symbol[i].find(p->id.name) != symbol[i].end()) 
+        {
+            symbolTable* entry = symbol[i][p->id.name];
+            if (isRHS && entry->symbolType == CONST) //Check if the identifier is a constant
+            {
+                char msg[1024];
+                sprintf(msg, "ERROR: Can't assign value to constant '%s'", p->id.name);
+                yyerror(msg);
+                return NULL;
+            }
+            if (!isRHS && entry->isInitialized == false) //Check if the identifier is initialized
+            {
+                char msg[1024];
+                sprintf(msg, "ERROR: Can't use an uninitialized identifier '%s'", p->id.name);
+                yyerror(msg);
+                return NULL;
+            }
+            //Set the identifier as used and return it
+            symbol[i][p->id.name]->used = true;
+            return symbol[i][p->id.name];
+        }
+  }
+
+  char msg[1024];
+  sprintf(msg, "ERROR: Undefined identifier '%s'", p->id.name);
+  yyerror(msg);
+  return NULL;  
+}
+
+symbolTable* declare_identifier(node* p, bool isRHS = false) {
+    if (p->type != ID) /*Not an identifier*/
+    {
+        return NULL;
+    }
+    else if (p->id.dataType == -1) /*Data type not set*/
+    {
+        return get_identifier(p, isRHS);
+    }
+
+    else if (symbol[level].count(p->id.name)) /*Identifier already declared*/
+    {
+        char msg[1024];
+        sprintf(msg, "ERROR: Identifier '%s' previously declared", p->id.name);
+        yyerror(msg);
+        return NULL;
+    }
+    else
+    {
+        //Add identifier to symbol table
+        symbol[level][p->id.name] = new symbolTable(strdup(p->id.name), p->id.dataType, p->id.qualifier, level, timeStep++, false);
+        //Add identifier to the list of symbols
+        symbolsTable.push_back(symbol[level][p->id.name]);
+        //Return the symbol table entry
+        return symbol[level][p->id.name];
+    }
 }
 
 
-void get_unused_variables(){
-    return;
-}
 
-void add_block_level(){
+void add_block_level()
+{
+    //push entries to the symbol table and increase scope level
+    symbol.push_back(map<string, symbolTable*>());
+    level++;
     return;
 }
 
 
 void remove_block_level(){
+    //pop entries from the symbol table and decrease scope level
+    symbol.pop_back();
+    level--;
     return;
 }
 

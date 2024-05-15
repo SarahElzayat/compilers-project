@@ -84,7 +84,10 @@ Keyword     Description
 
 
 /* Non Terminal Types */
-%type <n> program
+%type <n> program statement_list statement simple_statement compound_statement assignment_statement 
+%type <n> print_statement return_expression function_call declaration_statement 
+%type <n> for_statement while_statement do_while_statement if_statement switch_statement cases default_statement expression
+%type <n> data_type
 
 /* End of Tokens */
 
