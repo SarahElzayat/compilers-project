@@ -46,6 +46,7 @@ typedef struct
 {
     char *name; /* name of variable */
     int dataType;   /* type of id */
+    int sIndex;     /* index in sybmbol table*/
 } idNode;
 
 /* operators */

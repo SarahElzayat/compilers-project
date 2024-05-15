@@ -84,7 +84,7 @@ Keyword     Description
 
 
 /* Non Terminal Types */
-%type <n> program
+%type <n> program expression assignment_statement simple_statement
 
 /* End of Tokens */
 
@@ -92,26 +92,26 @@ Keyword     Description
 /* Part 4 : Production Rules */
 %%
 
-program : statement_list
+program : statement_list                              {}
         ;
 
 statement_list : statement
-               | statement_list statement
+               | statement_list statement             {}
                ;
 
-statement : simple_statement
-          | compound_statement
-          | '{' statement_list '}'
+statement : simple_statement                          {}
+          | compound_statement                        {}
+          | '{' statement_list '}'                    {}
           ;
 
-simple_statement : assignment_statement
-                 | declaration_statement
-                 | expression
-                 | function_call
-                 | print_statement
-                 | return_expression
-                 | BREAK
-                 | CONTINUE
+simple_statement : assignment_statement               {}
+                 | declaration_statement              {}
+                 | expression                         {}
+                 | function_call                      {}
+                 | print_statement                    {}
+                 | return_expression                  {}
+                 | BREAK                              {}
+                 | CONTINUE                           {}
                  ;
 
 compound_statement : for_statement
@@ -122,8 +122,8 @@ compound_statement : for_statement
                    ;
 
 
-assignment_statement : VARIABLE '=' expression
-                     | CONSTANT '=' expression
+assignment_statement : VARIABLE '=' expression        {}
+                     | CONSTANT '=' expression        {}
                      ;
 
 print_statement : PRINT '(' expression ')' 
@@ -177,9 +177,9 @@ expression : expression '+' expression
            | expression '-' expression 
            | expression '*' expression 
            | expression '/' expression 
-           | '(' expression ')' 
-           | NOT expression
-           | expression AND expression
+           | '(' expression ')'                   {$$=$2}
+           | NOT expression                        {$$=$2}
+           | expression AND expression             {$$=$1&&$3}
            | expression OR expression
            | expression GREATER_EQUAL expression
            | expression LESS_EQUAL expression
@@ -187,12 +187,12 @@ expression : expression '+' expression
            | expression NOTEQUAL expression
            | expression '<' expression
            | expression '>' expression     
-           | INTEGER
-           | FLOAT
-           | CHAR
-           | STRING                   
-           | VARIABLE                  
-           | CONSTANT
+           | INTEGER                                  {$$=$1}
+           | FLOAT                                    {$$=$1}
+           | CHAR                                     {$$=$1}       
+           | STRING                                   {$$=$1}
+           | VARIABLE                                 {$$=$1}
+           | CONSTANT                                 {$$=$1}
            ;
 %%
 /* End of Production Rules */
