@@ -3,7 +3,7 @@
 #include <vector>
 #include <sstream>
 #include "compiler.h"
-#include "newparser.tab.h"
+#include "parser.tab.h"
 
 static int label = 0;
 static int timeStep = 0;
@@ -165,7 +165,10 @@ void remove_block_level(){
 
 int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
 {
-    
+    va_list ap;
+    node* lblNode;
+    symbolTable* symbolTableEntry = NULL;
+
     if(!p)
     return 0;
     
@@ -184,34 +187,51 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
             case FLOAT:
                 printf("\tpush\t%f\n", p->value.floatValue);
                 break;
-
+            case BOOL:
+                printf("\tpush\t%f\n", p->value.boolValue);
+                break;
             case STRING:
                 printf("\tpush\t%s\n", p->value.stringValue);
                 break;
             }
             
             break;
+        //Identifiers are pushed to the stack and written to symbols table
         case ID:
-            //TODO: check of exist // add to symbol table
+            symbolTableEntry = get_identifier(p);
+            if (symbolTableEntry == NULL)
+            {
+                return 0;
+            }
             printf("\tpush\t%s\n", p->id.name); 
-            break;;
+            return symbolTableEntry->type;
+
         case OP:
-            int l1,l2;
-             
+            int l1,l2,l3;
+            int rhs, lhs;
             switch (p->opr.oper)
             {
                 case STATEMENT_LIST:
                     execute(p->opr.op[0]);
                     execute(p->opr.op[1]);
                     break;
+
+                /*WHILE LOOP*/
                 case WHILE:
-                    printf("L%03d:\n", l1 = label++);
-                    execute(p->opr.op[0]);
-                    printf("\tjz\tL%03d\n", l2 = label++);
-                    execute(p->opr.op[1]);
-                    printf("\tjmp\tL%03d\n", l1);
-                    printf("L%03d:\n", l2);
+                    add_block_level();
+
+                    printf("L%03d:\n", l1 = label++); //start
+                    execute(p->opr.op[0]); //condition
+                    printf("\tjz\tL%03d\n", l2 = label++); //if false
+
+                    execute(p->opr.op[1]); //body
+                    printf("\tjmp\tL%03d\n", l1); //continue
+                    printf("L%03d:\n", l2); //end
+
+                    remove_block_level();
                     break;
+
+                /*IF CONDITIONAL*/
                 case IF:
                     add_block_level();
                     std::cout<<"executing if\n";
@@ -232,40 +252,137 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
                     }
                     remove_block_level();
                     break;
-                case SWITCH:return 0;
-                case DO:return 0;
-                case FOR:return 0;
+
+                /*FOR LOOP*/
+                case FOR:
+                    add_block_level();
+                    execute(p->opr.op[0]); //initialize
+                    printf("L%03d:\n", l1 = label++);
+
+                    execute(p->opr.op[1]); //condition
+                    printf("\tjz\tL%03d\n", l2 = label++);
+
+                    execute(p->opr.op[3], l3 = label++, l2); //body
+                    printf("L%03d:\n", l3); //continue
+
+                    execute(p->opr.op[2]); //increment or decrement
+                    printf("\tjmp\tL%03d\n", l1);
+                    printf("L%03d:\n", l2);
+
+                    remove_block_level();
+                    break;
+
+                /*SWITCH CASE*/
+                case SWITCH:
+                
+                return 0;
+
+                /*DO WHILE LOOP*/
+                case DO:
+                    add_block_level();
+
+                    printf("L%03d:\n", l1 = label++); //start
+                    execute(p->opr.op[0]); //body
+                    execute(p->opr.op[1]); //condition
+                    printf("\tjnz\tL%03d\n", l1); //if true repeat
+
+                    remove_block_level();
+                    break;
+                
+                case '=': //copilot m3rfsh da eh
+                    symbolTableEntry = declare_identifier(p->opr.op[0], true);
+                    if (symbolTableEntry == NULL)
+                    {
+                        return 0;
+                    }
+                    execute(p->opr.op[1]);
+                    printf("\tpop\t%s\n", p->opr.op[0]->id.name);
+                    symbolTableEntry->isInitialized = true;
+                    break;
+
+                case NEGATIVE:
+                    lhs = execute(p->opr.op[0]);
+                    printf("\tneg\n");
+                    return lhs;
+                
                 case PRINT:         
                     execute(p->opr.op[0]);
                     printf("\tprint\n");
                     break;
+
                 case NOT : 
                     execute(p->opr.op[0]);
                     printf("\tNOT\n");
-                    break;
+                    return BOOL_TYPE;
+
                 case ASSIGNMENT:
                     execute(p->opr.op[1]);
                     printf("\tpop\t%s\n", p->opr.op[0]->id.name);
                     break;
 
                 //what about data types
-                        default:
-                execute(p->opr.op[0]); 
-                execute(p->opr.op[1]);
-                switch(p->opr.oper) {
-                case '+':   printf("\tadd\n"); break;
-                case '-':   printf("\tsub\n"); break; 
-                case '*':   printf("\tmul\n"); break;
-                case '/':   printf("\tdiv\n"); break;
-                case '<':   printf("\tcompLT\n"); break;
-                case '>':   printf("\tcompGT\n"); break;
-                case GREATER_EQUAL:    printf("\tcompGE\n"); break;
-                case LESS_EQUAL:    printf("\tcompLE\n"); break;
-                case NOTEQUAL:    printf("\tcompNE\n"); break;
-                case EQUAL:    printf("\tcompEQ\n"); break;
-                case OR:    printf("\tOR\n"); break;
-                case AND:    printf("\tAND\n"); break;
-            }
+                default:
+                //execute the left and right operands they have to be same type
+
+                    rhs = execute(p->opr.op[0]); 
+                    lhs = execute(p->opr.op[1]);
+                    if(rhs != lhs)
+                    {
+                        char msg[1024];
+                        sprintf(msg, "ERROR: MISMATCH Operands data types");
+                        yyerror(msg);
+                        return 0;
+                    }
+                    switch(p->opr.oper) 
+                    {
+                        case '+':
+                        printf("\tadd\n"); 
+                        return lhs;
+
+                        case '-':
+                        printf("\tsub\n"); 
+                        return lhs; 
+                        
+                        case '*':
+                        printf("\tmul\n");
+                        return lhs;
+
+                        case '/':
+                        printf("\tdiv\n");
+                        return lhs;
+
+                        case '<':
+                        printf("\tcompLT\n"); 
+                        return BOOL_TYPE;
+                        
+                        case '>':
+                        printf("\tcompGT\n"); 
+                        return BOOL_TYPE;
+                        
+                        case GREATER_EQUAL:
+                            printf("\tcompGE\n"); 
+                            return BOOL_TYPE;
+                        
+                        case LESS_EQUAL:
+                            printf("\tcompLE\n"); 
+                            return BOOL_TYPE;
+                        
+                        case NOTEQUAL:
+                            printf("\tcompNE\n"); 
+                            return BOOL_TYPE;
+                        
+                        case EQUAL:
+                            printf("\tcompEQ\n"); 
+                            return BOOL_TYPE;
+                        
+                        case OR:
+                            printf("\tOR\n"); 
+                            return BOOL_TYPE;
+                        
+                        case AND:
+                            printf("\tAND\n"); 
+                            return BOOL_TYPE;
+                    }
             }
             break;
    

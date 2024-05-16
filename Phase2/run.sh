@@ -1,5 +1,5 @@
-flex NEWlexer.l
-bison -d NEWparser.y
-g++  compiler.cpp newparser.tab.c lex.yy.c -o compiler.exe
+flex lexer.l
+bison -d parser.y
+g++  compiler.cpp parser.tab.c lex.yy.c -o compiler.exe
 ./compiler.exe < test.txt
 

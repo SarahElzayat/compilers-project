@@ -1,35 +1,44 @@
 %{  
+
+    //INCLUDES
     #include <stdio.h>
     #include "compiler.h"
     #include <stdbool.h>
-
+    //----------------------------------------------
+    //Function Prototypes
     extern void export_symbol_table();
     node *construct_operation_node(int oper, int nops, ...);
     node *construct_identifier_node(char*, int = -1, int = -1);
-    // node *construct_constant_node(int, int, ...);
+    node *construct_constant_node(int, int, ...);
+    node *construct_value_node(int, int, float, bool, char*, bool, char* = NULL);
+    //----------------------------------------------
+
     void free_node(node *p);
     int execute(node *p, int = -1, int = -1, int = 0, ...);
 
+    //----------------------------------------------
     int yylex(void);
     void yyerror(const char *msg);
 %}
-
 
 /* End of Definitions */
 
 
 
-/* Part 2 : Unions */
+/* Part 2 : Unions of yylval */
 %union
 {
-    int i;              /*   integer  */
-    float f;            /*   integer  */
-    char c;             /*   char     */
-    bool b;              /*   boolean  */
-    char *s;            /*   string   */
-    char *v;            /*   variable type */
-    char *sIdx;           /*   symbol table */
-    node *n;            /*   node     */
+    int iVal;              /*   integer       */
+    float fVal;            /*   float         */
+    bool bVal;             /*   boolean       */
+    char *strVal;          /*   string        */
+
+    char *conName;         /*   constant      */
+    char *varName;         /*   variable      */
+
+    char *sIdx;            /*   symbol table  */
+
+    node *n;               /*   node          */
 }
 
 /* End of Unions */
@@ -51,30 +60,32 @@ Keyword     Description
                                               
 
 /* Data types */
-%token <i> INTEGER
-%token <f> FLOAT
-%token <c> CHAR
-%token <b> BOOL
-%token <s> STRING
+%token <iVal> INTEGER
+%token <fVal> FLOAT
+%token <bVal> BOOL
+%token <strVal> STRING
+
+%token <conName> CONSTANT
 %token <sIdx> VARIABLE
 
-/* %token <s> VARIABLE */
-%token <s> CONSTANT
 /* Keywords */
-%token IF                                                 /* Keywords for if statement */
-%token SWITCH CASE DEFAULT                                          /* Keywords for switch statement */
-%token FOR WHILE DO BREAK CONTINUE                                  /* Keywords for loops */
-%token CONST_TYPE INT_TYPE FLOAT_TYPE BOOL_TYPE CHAR_TYPE STRING_TYPE    /* Keywords for data types */
-%token FUNCTION                                                     /* Keyword for function declaration */
-%token PRINT                                                        /* Keyword for print */
+%token IF                                                                /* Keywords for if statement */
+%token SWITCH CASE DEFAULT                                               /* Keywords for switch statement */
+%token FOR WHILE DO BREAK CONTINUE                                       /* Keywords for loops */
+%token CONST_TYPE INT_TYPE FLOAT_TYPE BOOL_TYPE STRING_TYPE              /* Keywords for data types */
+%token FUNCTION                                                          /* Keyword for function declaration */
+%token PRINT                                                             /* Keyword for print */
+
+
 %nonassoc RETURN
-%nonassoc IFX                                                      /* Keyword for If statement precedance handling*/
+%nonassoc IFX                                                       /* Keyword for If statement precedance handling*/
 %nonassoc ELSE                                                      /* Keyword for else statement */
 %nonassoc ENDLINE 
+
+
 /* Operators */
 /* The order matters as we go down the precedence of the operator increases */
 /* left and right keywords gove  */
-
 %right '='
 %left OR
 %left AND
@@ -82,12 +93,12 @@ Keyword     Description
 %left '+' '-'
 %left '*' '/'
 %right NOT
-
+%nonassoc NEGATIVE
 
 /* Non Terminal Types */
-%type <n> program statement_list statement simple_statement compound_statement assignment_statement 
-%type <n> print_statement return_expression function_call declaration_statement 
-%type <n> for_statement while_statement do_while_statement if_statement switch_statement cases default_statement expression
+%type <n> program statement_list statement assignment_statement 
+%type <n> function_call declaration_statement 
+%type <n> for_statement while_statement do_while_statement if_statement switch_statement cases expression
 %type <n> data_type
 
 /* End of Tokens */
@@ -96,74 +107,72 @@ Keyword     Description
 /* Part 4 : Production Rules */
 %%
 
-program : statement_list
+program : statement_list   {execute($1);free_node($1); std::cout<<"program "<<std::endl;exit(0);}
         ;
 
-statement_list : statement                  {execute($1);}
-               | statement_list statement     {}
+statement_list : statement                    {$$=$1;}
+               | statement_list statement     {$$=construct_operation_node(STATEMENT_LIST,2,$1,$2);}
                ;
 
-statement : simple_statement                  {}
-          | compound_statement                 {}
-          | '{' statement_list '}'              {}
+statement : assignment_statement              {std::cout<<"assignment_statement "<<std::endl;$$=$1;}
+          | declaration_statement             {std::cout<<"declaration_statement "<<std::endl;}
+          | expression                        {std::cout<<"expression "<<std::endl;$$=$1;}
+
+          | PRINT '(' expression ')'          {std::cout<<"PRINT EXP "<<std::endl;$$=construct_operation_node(PRINT,1,$3);}
+
+
+          | for_statement                     {std::cout<<"for_statement "<<std::endl;}
+          | while_statement                   {std::cout<<"while_statement "<<std::endl;$$=$1}
+          | do_while_statement                {std::cout<<"do_while_statement "<<std::endl;}
+
+          | if_statement                      {std::cout<<"if_statement "<<std::endl;$$=$1;}
+          | switch_statement                  {std::cout<<"switch_statement "<<std::endl;}
+          | function_call                     {std::cout<<"function_call "<<std::endl;}
+
+
+          | RETURN ENDLINE                    {std::cout<<"RETURN "<<std::endl;}
+          | RETURN expression ENDLINE         {std::cout<<"RETURN EXP "<<std::endl;}
+
+          | BREAK                             {std::cout<<"BREAK "<<std::endl;}
+          | CONTINUE                          {std::cout<<"CONTINUE "<<std::endl;}
           ;
 
-simple_statement : assignment_statement         {}
-                 | declaration_statement        {}
-                 | expression                   {}
-                 | function_call                {}
-                 | print_statement               {}
-                 | return_expression              {}    
-                 | BREAK                          {}
-                 | CONTINUE                 {}
-                 ;
 
-compound_statement : for_statement      {}
-                   | while_statement      {}
-                   | if_statement         {}
-                   | do_while_statement     {}
-                   | switch_statement     {}
-                   ;
-
-
-
-assignment_statement : VARIABLE '=' expression     {$$ = construct_operation_node(ASSIGNMENT, 2, construct_identifier_node($1),$3); }
+assignment_statement : VARIABLE '=' expression     {$$ = construct_operation_node(ASSIGNMENT, 2, construct_identifier_node($1),$3);}
                      | CONSTANT '=' expression    {}
                      ;
 
-print_statement : PRINT '(' expression ')'    {}
-                ;   
-return_expression : RETURN expression ENDLINE   {}
-                  | RETURN ENDLINE                {}
-                  ;
+              
 
 function_call : FUNCTION '(' expression ')'   {}
             ;
 
-data_type : INT_TYPE      {}
-          | FLOAT_TYPE    {}
-          | BOOL_TYPE   {}
-          | CHAR_TYPE     {}
-          | STRING_TYPE     {}
+data_type : INT_TYPE          {$$=INT_TYPE}
+          | FLOAT_TYPE        {}
+          | BOOL_TYPE         {}
+          | STRING_TYPE       {}
+          | CONST_TYPE        {}
           ;
 
-declaration_statement : CONST_TYPE data_type CONSTANT '=' expression    {}
-                      | data_type VARIABLE '=' expression             {}
+declaration_statement : data_type VARIABLE '=' expression    { $$ = construct_operation_node('=', 2, construct_identifier_node($2,$1), $4);}
+                      | data_type CONSTANT '=' expression    {}
                       ;
 
-
-for_statement : FOR '(' declaration_statement ';' expression ';' assignment_statement ')' statement   {}
+/* Loops */
+for_statement : FOR '(' declaration_statement ';' expression ';' assignment_statement ')' '{'statement_list'}'   {std::cout<<"for_statement "<<std::endl; $$ = construct_operation_node(FOR, 4, $3, $5, $7, $10);}
               ;
 
-while_statement : WHILE '(' expression ')' statement    {con}
+while_statement : WHILE '(' expression ')'  '{' statement_list '}'    {std::cout<<"while_statement "<<std::endl; $$=construct_operation_node(WHILE,2,$3,$6);}
                 ;
 
-do_while_statement : DO statement WHILE '(' expression ')'        {}
+
+do_while_statement : DO '{' statement_list '}' WHILE '(' expression ')'        {std::cout<<"do_while_statement" <<std::endl; $$=construct_operation_node(DO,2,$3,$7);}
                     ;
 
-if_statement : IF '(' expression ')' statement %prec IFX              {}
-             | IF '(' expression ')' statement ELSE statement         {}
-             ;
+/* Conditional Statement */
+if_statement : IF '(' expression ')' '{' statement_list '}' %prec IFX                         {$$=construct_operation_node(IF,2,$3,$6);}
+             | IF '(' expression ')' '{' statement_list '}'ELSE '{' statement_list  '}'       {$$=construct_operation_node(IF,3,$3,$6,$10);}
+              ;
 
 switch_statement :  SWITCH '(' VARIABLE ')' '{' cases '}'                           {}
                  |  SWITCH '(' VARIABLE ')' '{' cases  default_statement'}'           {}
@@ -175,13 +184,26 @@ cases : CASE INTEGER ':' statement cases                  {}
       ;
 
 default_statement : DEFAULT ':' statement     {}
-
  
-expression : expression '+' expression            {$$=construct_operation_node('+',2,$1,$3);}
+ 
+expression : 
+            /*Terminal*/
+            INTEGER                    {$$ = construct_value_node( INTEGER, $1,0.0,0,NULL);}
+           | FLOAT                     {$$ = construct_value_node(FLOAT,0,$1,0,NULL);}
+           | STRING                     {$$ = construct_value_node(STRING,0,0.0,0,$1);}  
+           | BOOL                       {}
+           | VARIABLE                       {$$ = construct_identifier_node($1);}
+           | CONSTANT                               {}
+           /*Negative*/
+            | '-' expression %prec NEGATIVE        {$$=construct_operation_node(NEGATIVE,1,$2);}  
+           /*Mathimatical*/
+           | expression '+' expression            {$$=construct_operation_node('+',2,$1,$3);}
            | expression '-' expression            {$$=construct_operation_node('-',2,$1,$3);}
            | expression '*' expression            {$$=construct_operation_node('*',2,$1,$3);}
            | expression '/' expression            {$$=construct_operation_node('/',2,$1,$3);}
-           | '(' expression ')'                   {$$=$2}
+           | expression '<' expression          {$$=construct_operation_node('<',2,$1,$3);}
+           | expression '>' expression         {$$=construct_operation_node('>',2,$1,$3);}
+           /*Logical*/
            | NOT expression                       {$$=construct_operation_node(NOT,2,$2);}
            | expression AND expression        {$$=construct_operation_node(AND,2,$1,$3);}
            | expression OR expression         {$$=construct_operation_node(OR,2,$1,$3);}
@@ -189,43 +211,37 @@ expression : expression '+' expression            {$$=construct_operation_node('
            | expression LESS_EQUAL expression     {$$=construct_operation_node(LESS_EQUAL,2,$1,$3);}
            | expression EQUAL expression      {$$=construct_operation_node(EQUAL,2,$1,$3);}
            | expression NOTEQUAL expression   {$$=construct_operation_node(NOTEQUAL,2,$1,$3);}
-           | expression '<' expression          {$$=construct_operation_node('<',2,$1,$3);}
-           | expression '>' expression         {$$=construct_operation_node('>',2,$1,$3);}
-           | INTEGER                    {$$ = construct_value_node( INTEGER, $1,0.0,0,NULL);}
-           | FLOAT                     {$$ = construct_value_node(FLOAT,0,$1,0,NULL);}
-           | CHAR                      {$$ = construct_value_node(CHAR,0,0.0,$1,NULL);}
-           | STRING                     {$$ = construct_value_node(STRING,0,0.0,0,$1);}             
-           | VARIABLE                       {}
-           | CONSTANT                               {}
+           | '(' expression ')'                   {$$=$2}
            ;
+           
 %%
 /* End of Production Rules */
 
 
 /* Part 5 : Functions and Main */
-/* node *construct_constant_node(int type, int dataType, ...) { */
-    // va_list ap; /* variable argument list */
-    // node *p;
-    // size_t nodeSize;
+node *construct_constant_node(int type, int dataType, ...) {
+     va_list ap; /* variable argument list */
+     node *p;
+     size_t nodeSize;
 
-    // /* allocate Node */
-    // nodeSize = SIZEOF_NODETYPE + sizeof(constantNode);
-    // if ((p = (node*)malloc(nodeSize)) == NULL)
-    // {
-    //     yyerror("out of memory");
-    // }
+     /* allocate Node */
+     nodeSize = SIZEOF_NODETYPE + sizeof(constantNode);
+     if ((p = (node*)malloc(nodeSize)) == NULL)
+     {
+         yyerror("out of memory");
+     }
 
-    // /* copy information */
-    // p->type = CONST;
-    // p->con.dataType = dataType;
-    // va_start(ap, dataType); /* initialize va */
-    // p->con.value = va_arg(ap, valType); /* get value */
-    // va_end(ap); /* clean up va */
+     /* copy information */
+     p->type = CONST;
+     p->con.dataType = dataType;
+     va_start(ap, dataType); /* initialize va */
+     p->con.value = va_arg(ap, valueType); /* get value */
+     va_end(ap); /* clean up va */
 
-    // return p;
-/* } */
+     return p;
+}
 
-node *construct_value_node(int dataType,int intValue, float floatValue, char charValue, char *stringValue) {
+node *construct_value_node(int dataType, int intValue, float floatValue, bool boolValue,char *stringValue, bool isConstant, char *name = NULL) {
 
   
     node *p;
@@ -234,34 +250,63 @@ node *construct_value_node(int dataType,int intValue, float floatValue, char cha
     if ((p = (node *)malloc(sizeof(node))) == NULL)
         yyerror("out of memory");
 
-    /* copy information */
-    p->type = VALUE;
-    p->value.type=dataType;
-
-    switch (dataType)
+   
+    if(isConstant)
     {
-      
-      case INTEGER:
-  
-        p->value.intValue = intValue;
-        
-        break;
-      case FLOAT:
-        p->value.floatValue = floatValue;
-        
-        break;
-      case CHAR:
-        p->value.charValue = charValue;
-        
+        /* copy information if VALUE */
+          p->type = CONST;
+          p->con.dataType=dataType;
+          p->con.name=name;
 
-        break;
-      case STRING:
-        p->value.stringValue = stringValue;
-        break;
-        /* case BOOL:
-        p->value.boolValue = 0.0;
-        break; */
+          switch (dataType)
+          {
+            
+            case INTEGER:
+              p->con.value.intValue = intValue;
+              break;
+
+            case FLOAT:
+              p->con.value.floatValue = floatValue;
+              break;
+            
+            case BOOL:
+              p->con.value.boolValue = boolValue;
+              break;
+
+            case STRING:
+              p->con.value.stringValue = stringValue;
+              break;
+
+          }
     }
+    else
+    {
+         /* copy information if VALUE */
+          p->type = VALUE;
+          p->value.type=dataType;
+          switch (dataType)
+          {
+            
+            case INTEGER:
+              p->value.intValue = intValue;
+              break;
+
+            case FLOAT:
+              p->value.floatValue = floatValue;
+              break;
+            
+            case BOOL:
+              p->value.boolValue = boolValue;
+              break;
+
+            case STRING:
+              p->value.stringValue = stringValue;
+              break;
+
+          }
+    }
+
+    
 
     return p;
 }

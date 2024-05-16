@@ -463,12 +463,12 @@ goto find_rule; \
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "NEWlexer.l"
+#line 1 "lexer.l"
 #define INITIAL 0
 /* Part 1 : Definitions */
-#line 3 "NEWlexer.l"
+#line 3 "lexer.l"
     #include "compiler.h"
-    #include "newparser.tab.h"
+    #include "parser.tab.h"
     #include <stdbool.h>
 /* End of Definitions */
 /* Part 2 : Regular Expressions */
@@ -623,7 +623,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 14 "NEWlexer.l"
+#line 14 "lexer.l"
 
 #line 629 "lex.yy.c"
 
@@ -718,14 +718,14 @@ do_action:	/* This label is used only to access EOF actions. */
 	{ /* beginning of action switch */
 case 1:
 YY_RULE_SETUP
-#line 15 "NEWlexer.l"
+#line 15 "lexer.l"
 { /* INTEGERS */ 
                               yylval.iVal = atoi(yytext); 
                               return INTEGER; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 19 "NEWlexer.l"
+#line 19 "lexer.l"
 { /* FLOATS */ 
                               char * x = strdup(yytext); // to ensure null-terminated string
                               yylval.fVal = atof(yytext);
@@ -733,177 +733,177 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 24 "NEWlexer.l"
+#line 24 "lexer.l"
 { return PRINT;  }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 25 "NEWlexer.l"
+#line 25 "lexer.l"
 { return RETURN; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 27 "NEWlexer.l"
+#line 27 "lexer.l"
 { 
                               yylval.bVal = 1;
                                return BOOL; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 30 "NEWlexer.l"
+#line 30 "lexer.l"
 { 
                               yylval.bVal = 0;
                                return BOOL; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 34 "NEWlexer.l"
+#line 34 "lexer.l"
 { return yytext[0]; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 36 "NEWlexer.l"
+#line 36 "lexer.l"
 { return GREATER_EQUAL; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 37 "NEWlexer.l"
+#line 37 "lexer.l"
 { return LESS_EQUAL;    }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 38 "NEWlexer.l"
+#line 38 "lexer.l"
 { return EQUAL;         } 
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 39 "NEWlexer.l"
+#line 39 "lexer.l"
 { return NOTEQUAL;      }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 41 "NEWlexer.l"
+#line 41 "lexer.l"
 { return AND;           }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 42 "NEWlexer.l"
+#line 42 "lexer.l"
 { return OR;            }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 43 "NEWlexer.l"
+#line 43 "lexer.l"
 { return NOT;           }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 45 "NEWlexer.l"
+#line 45 "lexer.l"
 { return CONST_TYPE;       }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 46 "NEWlexer.l"
+#line 46 "lexer.l"
 { return INT_TYPE;    }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 47 "NEWlexer.l"
+#line 47 "lexer.l"
 { return FLOAT_TYPE;  }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 48 "NEWlexer.l"
+#line 48 "lexer.l"
 { return STRING_TYPE; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 49 "NEWlexer.l"
+#line 49 "lexer.l"
 { return BOOL_TYPE;   }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 52 "NEWlexer.l"
+#line 52 "lexer.l"
 { return FOR;      }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 54 "NEWlexer.l"
+#line 54 "lexer.l"
 { return DO;       }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 55 "NEWlexer.l"
+#line 55 "lexer.l"
 { return WHILE;    }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 57 "NEWlexer.l"
+#line 57 "lexer.l"
 { return BREAK;    }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 58 "NEWlexer.l"
+#line 58 "lexer.l"
 { return CONTINUE; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 60 "NEWlexer.l"
+#line 60 "lexer.l"
 { return ELSE;     }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 61 "NEWlexer.l"
+#line 61 "lexer.l"
 { return IF;       }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 63 "NEWlexer.l"
+#line 63 "lexer.l"
 { return SWITCH;   }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 64 "NEWlexer.l"
+#line 64 "lexer.l"
 { return CASE;     }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 66 "NEWlexer.l"
+#line 66 "lexer.l"
 { return FUNCTION; }   
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 67 "NEWlexer.l"
+#line 67 "lexer.l"
 { return DEFAULT;  }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 69 "NEWlexer.l"
+#line 69 "lexer.l"
 { 
                                yylval.conName = strdup(yytext);
                                return CONSTANT;  }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 73 "NEWlexer.l"
+#line 73 "lexer.l"
 { 
                               yylval.varName = strdup(yytext);
                               return VARIABLE;  }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 77 "NEWlexer.l"
+#line 77 "lexer.l"
 { 
                               yylval.strVal = strdup(yytext);
                               return STRING;    }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 81 "NEWlexer.l"
+#line 81 "lexer.l"
 { /* ignore whitespace */ }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 83 "NEWlexer.l"
+#line 83 "lexer.l"
 { 
     char msg[1024];
     sprintf(msg, "Unknown character: %s", yytext);
@@ -912,7 +912,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 89 "NEWlexer.l"
+#line 89 "lexer.l"
 ECHO;
 	YY_BREAK
 #line 919 "lex.yy.c"
@@ -1799,7 +1799,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 89 "NEWlexer.l"
+#line 89 "lexer.l"
 
 /* End of Regular Expressions */
 

@@ -21,6 +21,7 @@ using std::map;
 
 #define ASSIGNMENT   1
 #define STATEMENT_LIST  2
+
 typedef enum
 {
     CONST,
@@ -37,7 +38,6 @@ typedef struct
         int intValue;
         float floatValue;
         bool boolValue;
-        char charValue;
         char *stringValue;
     };
 } valueType;
@@ -48,7 +48,6 @@ typedef struct
     valueType value; /* value of constant */
     char *name;      /* name of constant */
     int dataType;        /* type of constant */
-    int qualifier;       /* qualifier of constant */
 } constantNode;
 
 /* constants */

@@ -13,37 +13,41 @@
 /* Part 2 : Regular Expressions */
 %%
 [0-9]+                       { /* INTEGERS */ 
-                              yylval.i = atoi(yytext); 
+                              yylval.iVal = atoi(yytext); 
                               return INTEGER; }
 
 (0|[1-9][0-9]*)\.[0-9]*     { /* FLOATS */ 
                               char * x = strdup(yytext); // to ensure null-terminated string
-                              yylval.f = atof(yytext);
+                              yylval.fVal = atof(yytext);
                               return FLOAT; }
 
 "print"                     { return PRINT;  }
 "return"                    { return RETURN; }
 
-"true"                      { return BOOL; }
-"false"                     { return BOOL; }
+"true"                      { 
+                              yylval.bVal = 1;
+                               return BOOL; }
+"false"                     { 
+                              yylval.bVal = 0;
+                               return BOOL; }
 
-[-()+*/{}<>=.^]             { return yytext[0]; }
+[-()+*/{}<>=.:]             { return yytext[0]; }
 
 ">="                        { return GREATER_EQUAL; }
 "<="                        { return LESS_EQUAL;    }
 "=="                        { return EQUAL;         } 
 "!="                        { return NOTEQUAL;      }
+
 "and"                       { return AND;           }
 "or"                        { return OR;            }
 "not"                       { return NOT;           }
 
-"const"                     { return CONST;       }
+"const"                     { return CONST_TYPE;       }
 "int"                       { return INT_TYPE;    }
 "float"                     { return FLOAT_TYPE;  }
-"char"                      { return CHAR_TYPE;   }
 "string"                    { return STRING_TYPE; }
 "bool"                      { return BOOL_TYPE;   }
-
+ 
 
 "for"                       { return FOR;      }
 
@@ -62,13 +66,17 @@
 "def"                       { return FUNCTION; }   
 "default"                   { return DEFAULT;  }
 
+[A-Z_][A-Z0-9_]*            { 
+                               yylval.conName = strdup(yytext);
+                               return CONSTANT;  }
 
-
-[A-Z_][A-Z0-9_]*            { return CONSTANT;  }
 [a-zA-Z_][a-zA-Z0-9_]*      { 
-                              yylval.s = strdup(yytext);
+                              yylval.varName = strdup(yytext);
                               return VARIABLE;  }
-
+  
+\".*\"                      { 
+                              yylval.strVal = strdup(yytext);
+                              return STRING;    }
 
 [ \t\n]+  { /* ignore whitespace */ }
 
@@ -90,4 +98,4 @@ void yyerror(const char *s) {
   exit(0);
 }
 
-/* Part 3 : Functions and Main*/
+
