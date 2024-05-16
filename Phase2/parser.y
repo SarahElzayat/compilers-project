@@ -127,9 +127,7 @@ compound_statement : for_statement      {}
 
 
 
-assignment_statement : VARIABLE '=' expression     {
-                      $$ = construct_operation_node(ASSIGNMENT, 2, construct_identifier_node($1),$3);
-                      }
+assignment_statement : VARIABLE '=' expression     {$$ = construct_operation_node(ASSIGNMENT, 2, construct_identifier_node($1),$3); }
                      | CONSTANT '=' expression    {}
                      ;
 
@@ -157,7 +155,7 @@ declaration_statement : CONST_TYPE data_type CONSTANT '=' expression    {}
 for_statement : FOR '(' declaration_statement ';' expression ';' assignment_statement ')' statement   {}
               ;
 
-while_statement : WHILE '(' expression ')' statement    {}
+while_statement : WHILE '(' expression ')' statement    {con}
                 ;
 
 do_while_statement : DO statement WHILE '(' expression ')'        {}
@@ -183,7 +181,7 @@ expression : expression '+' expression            {$$=construct_operation_node('
            | expression '-' expression            {$$=construct_operation_node('-',2,$1,$3);}
            | expression '*' expression            {$$=construct_operation_node('*',2,$1,$3);}
            | expression '/' expression            {$$=construct_operation_node('/',2,$1,$3);}
-           | '(' expression ')'           {}
+           | '(' expression ')'                   {$$=$2}
            | NOT expression                       {$$=construct_operation_node(NOT,2,$2);}
            | expression AND expression        {$$=construct_operation_node(AND,2,$1,$3);}
            | expression OR expression         {$$=construct_operation_node(OR,2,$1,$3);}

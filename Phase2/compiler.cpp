@@ -3,7 +3,7 @@
 #include <vector>
 #include <sstream>
 #include "compiler.h"
-#include "parser.tab.h"
+#include "newparser.tab.h"
 
 static int label = 0;
 static int timeStep = 0;
@@ -24,9 +24,7 @@ const char* get_data_type(int type){
         case BOOL:
         case BOOL_TYPE:
             return "bool";
-        case CHAR:
-        case CHAR_TYPE:
-            return "char";
+
         case STRING:
         case STRING_TYPE:
             return "string";
@@ -176,9 +174,8 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
         case CONST: 
             printf("\tpush\t%d\n", p->con.value); 
             break; 
-        case VALUE:
-     
 
+        case VALUE:
             switch (p->value.type)
             {
             case INTEGER:
@@ -187,9 +184,7 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
             case FLOAT:
                 printf("\tpush\t%f\n", p->value.floatValue);
                 break;
-            case CHAR:
-                printf("\tpush\t%c\n", p->value.charValue);
-                break;
+
             case STRING:
                 printf("\tpush\t%s\n", p->value.stringValue);
                 break;
@@ -201,9 +196,11 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
             printf("\tpush\t%s\n", p->id.name); 
             break;;
         case OP:
+            int l1,l2;
+             
             switch (p->opr.oper)
             {
-                int l1,l2;
+               
                 case WHILE:
                     printf("L%03d:\n", l1 = label++);
                     execute(p->opr.op[0]);
@@ -213,6 +210,7 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
                     printf("L%03d:\n", l2);
                     break;
                 case IF:
+                    add_block_level();
                     execute(p->opr.op[0]);
                     if (p->opr.nops > 2) {
                         /* if else */
@@ -228,6 +226,7 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
                         execute(p->opr.op[1]);
                         printf("L%03d:\n", l1);
                     }
+                    remove_block_level();
                     break;
                 case SWITCH:return 0;
                 case DO:return 0;

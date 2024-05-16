@@ -1,7 +1,7 @@
 /* Part 1 : Definitions */
 %{
     #include "compiler.h"
-    #include "parser.tab.h"
+    #include "newparser.tab.h"
     #include <stdbool.h>
 %}
 
@@ -25,10 +25,10 @@
 "return"                    { return RETURN; }
 
 "true"                      { 
-                              yylval.boolVal = 1;
+                              yylval.bVal = 1;
                                return BOOL; }
 "false"                     { 
-                              yylval.boolVal = 0;
+                              yylval.bVal = 0;
                                return BOOL; }
 
 [-()+*/{}<>=.:]             { return yytext[0]; }
@@ -42,7 +42,7 @@
 "or"                        { return OR;            }
 "not"                       { return NOT;           }
 
-"const"                     { return CONST;       }
+"const"                     { return CONST_TYPE;       }
 "int"                       { return INT_TYPE;    }
 "float"                     { return FLOAT_TYPE;  }
 "string"                    { return STRING_TYPE; }
@@ -66,10 +66,12 @@
 "def"                       { return FUNCTION; }   
 "default"                   { return DEFAULT;  }
 
-
+[A-Z_][A-Z0-9_]*            { 
+                               yylval.conName = strdup(yytext);
+                               return CONSTANT;  }
 
 [a-zA-Z_][a-zA-Z0-9_]*      { 
-                              yylval.s = strdup(yytext);
+                              yylval.varName = strdup(yytext);
                               return VARIABLE;  }
   
 \".*\"                      { 
