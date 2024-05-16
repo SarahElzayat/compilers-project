@@ -59,7 +59,7 @@ void export_symbol_table(){
     symbolTable* st;
     int i;
 
-    if ((fp = fopen("./out/symbolTable.txt", "w")) == NULL)
+    if ((fp = fopen("./outputs/symbolTable.txt", "w")) == NULL)
     {
         yyerror("cannot open symbolTable.txt");
     }
