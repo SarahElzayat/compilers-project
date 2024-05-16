@@ -120,7 +120,7 @@ statement : assignment_statement              {std::cout<<"assignment_statement 
           | expression                        {std::cout<<"expression "<<std::endl;$$=$1;}
 
           | PRINT '(' expression ')'          {std::cout<<"PRINT EXP "<<std::endl;}
-          | PRINT '(' VARIABLE ')'            {std::cout<<"PRINT VAR "<<std::endl;}
+
 
           | for_statement                     {std::cout<<"for_statement "<<std::endl;}
           | while_statement                   {std::cout<<"while_statement "<<std::endl;$$=$1}
