@@ -1,15 +1,18 @@
 %{  
+
+    //INCLUDES
     #include <stdio.h>
     #include "compiler.h"
     #include <stdbool.h>
-
+    //----------------------------------------------
+    //Function Prototypes
     extern void export_symbol_table();
     node *construct_operation_node(int oper, int nops, ...);
     node *construct_identifier_node(char*, int = -1, int = -1);
     node *construct_constant_node(int, int, ...);
     node *construct_value_node(int, int, float, char, char*);
-
-
+    //----------------------------------------------
+    //Quadruple Functions
     void quadPOP();
     void quadPUSH(node *p);
     void quadJMP();
@@ -18,21 +21,21 @@
     void quadPrint();
 
 
+    //----------------------------------------------
 
     void free_node(node *p);
     int execute(node *p, int = -1, int = -1, int = 0, ...);
 
-    
+    //----------------------------------------------
     int yylex(void);
     void yyerror(const char *msg);
 %}
-
 
 /* End of Definitions */
 
 
 
-/* Part 2 : Unions */
+/* Part 2 : Unions of yylval */
 %union
 {
     int i;              /*   integer  */
