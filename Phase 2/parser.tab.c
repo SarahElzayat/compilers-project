@@ -1047,11 +1047,11 @@ case 45:
     break;}
 case 46:
 #line 184 "parser.y"
-{;
+{yyval.n=construct_operation_node('*',2,yyvsp[-2].n,yyvsp[0].n);;
     break;}
 case 47:
 #line 185 "parser.y"
-{;
+{yyval.n=construct_operation_node('/',2,yyvsp[-2].n,yyvsp[0].n);;
     break;}
 case 48:
 #line 186 "parser.y"
@@ -1059,39 +1059,39 @@ case 48:
     break;}
 case 49:
 #line 187 "parser.y"
-{;
+{yyval.n=construct_operation_node(NOT,2,yyvsp[0].n);;
     break;}
 case 50:
 #line 188 "parser.y"
-{;
+{yyval.n=construct_operation_node(AND,2,yyvsp[-2].n,yyvsp[0].n);;
     break;}
 case 51:
 #line 189 "parser.y"
-{;
+{yyval.n=construct_operation_node(OR,2,yyvsp[-2].n,yyvsp[0].n);;
     break;}
 case 52:
 #line 190 "parser.y"
-{;
+{yyval.n=construct_operation_node(GREATER_EQUAL,2,yyvsp[-2].n,yyvsp[0].n);;
     break;}
 case 53:
 #line 191 "parser.y"
-{;
+{yyval.n=construct_operation_node(LESS_EQUAL,2,yyvsp[-2].n,yyvsp[0].n);;
     break;}
 case 54:
 #line 192 "parser.y"
-{;
+{yyval.n=construct_operation_node(EQUAL,2,yyvsp[-2].n,yyvsp[0].n);;
     break;}
 case 55:
 #line 193 "parser.y"
-{;
+{yyval.n=construct_operation_node(NOTEQUAL,2,yyvsp[-2].n,yyvsp[0].n);;
     break;}
 case 56:
 #line 194 "parser.y"
-{;
+{yyval.n=construct_operation_node('<',2,yyvsp[-2].n,yyvsp[0].n);;
     break;}
 case 57:
 #line 195 "parser.y"
-{;
+{yyval.n=construct_operation_node('>',2,yyvsp[-2].n,yyvsp[0].n);;
     break;}
 case 58:
 #line 196 "parser.y"
@@ -1369,7 +1369,7 @@ node *construct_constant_node(int type, int dataType, ...) {
 
 node *construct_value_node(int dataType,int intValue, float floatValue, char charValue, char *stringValue) {
 
-  std::cout<<"hi "<<std::endl;
+  
     node *p;
 
     /* allocate node */

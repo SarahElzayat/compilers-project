@@ -179,20 +179,20 @@ cases : CASE INTEGER ':' statement cases                  {}
 default_statement : DEFAULT ':' statement     {}
 
  
-expression : expression '+' expression      {$$=construct_operation_node('+',2,$1,$3);}
-           | expression '-' expression      {$$=construct_operation_node('-',2,$1,$3);}
-           | expression '*' expression        {}
-           | expression '/' expression          {}
+expression : expression '+' expression            {$$=construct_operation_node('+',2,$1,$3);}
+           | expression '-' expression            {$$=construct_operation_node('-',2,$1,$3);}
+           | expression '*' expression            {$$=construct_operation_node('*',2,$1,$3);}
+           | expression '/' expression            {$$=construct_operation_node('/',2,$1,$3);}
            | '(' expression ')'           {}
-           | NOT expression       {}
-           | expression AND expression        {}
-           | expression OR expression         {}
-           | expression GREATER_EQUAL expression    {}
-           | expression LESS_EQUAL expression     {}
-           | expression EQUAL expression      {}
-           | expression NOTEQUAL expression   {}
-           | expression '<' expression          {}
-           | expression '>' expression         {}
+           | NOT expression                       {$$=construct_operation_node(NOT,2,$2);}
+           | expression AND expression        {$$=construct_operation_node(AND,2,$1,$3);}
+           | expression OR expression         {$$=construct_operation_node(OR,2,$1,$3);}
+           | expression GREATER_EQUAL expression    {$$=construct_operation_node(GREATER_EQUAL,2,$1,$3);}
+           | expression LESS_EQUAL expression     {$$=construct_operation_node(LESS_EQUAL,2,$1,$3);}
+           | expression EQUAL expression      {$$=construct_operation_node(EQUAL,2,$1,$3);}
+           | expression NOTEQUAL expression   {$$=construct_operation_node(NOTEQUAL,2,$1,$3);}
+           | expression '<' expression          {$$=construct_operation_node('<',2,$1,$3);}
+           | expression '>' expression         {$$=construct_operation_node('>',2,$1,$3);}
            | INTEGER                    {$$ = construct_value_node( INTEGER, $1,0.0,0,NULL);}
            | FLOAT                     {$$ = construct_value_node(FLOAT,0,$1,0,NULL);}
            | CHAR                      {$$ = construct_value_node(CHAR,0,0.0,$1,NULL);}

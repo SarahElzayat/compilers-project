@@ -236,13 +236,10 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
                     execute(p->opr.op[0]);
                     printf("\tprint\n");
                     break;
-                case OR:return 0;
-                case AND:return 0;
-                case GREATER_EQUAL:return 0;
-                case EQUAL:return 0;
-                case LESS_EQUAL:return 0;
-                case NOT : return 0;
-                case NOTEQUAL: return 0;
+                case NOT : 
+                    execute(p->opr.op[0]);
+                    printf("\tNOT\n");
+                    break;
                 case ASSIGNMENT:
                     execute(p->opr.op[1]);
                     printf("\tpop\t%s\n", p->opr.op[0]->id.name);
@@ -263,8 +260,8 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
                 case LESS_EQUAL:    printf("\tcompLE\n"); break;
                 case NOTEQUAL:    printf("\tcompNE\n"); break;
                 case EQUAL:    printf("\tcompEQ\n"); break;
-                case OR:    printf("\tcompEQ\n"); break;
-                case AND:    printf("\tcompEQ\n"); break;
+                case OR:    printf("\tOR\n"); break;
+                case AND:    printf("\tAND\n"); break;
             }
             }
             break;
