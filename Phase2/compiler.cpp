@@ -200,7 +200,10 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
              
             switch (p->opr.oper)
             {
-               
+                case STATEMENT_LIST:
+                    execute(p->opr.op[0]);
+                    execute(p->opr.op[1]);
+                    break;
                 case WHILE:
                     printf("L%03d:\n", l1 = label++);
                     execute(p->opr.op[0]);
@@ -211,6 +214,7 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
                     break;
                 case IF:
                     add_block_level();
+                    std::cout<<"executing if\n";
                     execute(p->opr.op[0]);
                     if (p->opr.nops > 2) {
                         /* if else */

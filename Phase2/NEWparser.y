@@ -69,6 +69,7 @@ Keyword     Description
 %token <sIdx> VARIABLE
 
 /* Keywords */
+%token STATEMENT_LIST
 %token IF                                                                /* Keywords for if statement */
 %token SWITCH CASE DEFAULT                                               /* Keywords for switch statement */
 %token FOR WHILE DO BREAK CONTINUE                                       /* Keywords for loops */
@@ -107,11 +108,11 @@ Keyword     Description
 /* Part 4 : Production Rules */
 %%
 
-program : statement_list   {std::cout<<"program "<<std::endl;exit(0)}
+program : statement_list   {execute($1);free_node($1); std::cout<<"program "<<std::endl;exit(0);}
         ;
 
-statement_list : statement                    {execute($1);}
-               | statement_list statement     {execute($2);}
+statement_list : statement                    {$$=$1;}
+               | statement_list statement     {$$=construct_operation_node(STATEMENT_LIST,2,$1,$2);}
                ;
 
 statement : assignment_statement              {std::cout<<"assignment_statement "<<std::endl;}
@@ -122,7 +123,7 @@ statement : assignment_statement              {std::cout<<"assignment_statement 
           | PRINT '(' VARIABLE ')'            {std::cout<<"PRINT VAR "<<std::endl;}
 
           | for_statement                     {std::cout<<"for_statement "<<std::endl;}
-          | while_statement                   {std::cout<<"while_statement "<<std::endl;}
+          | while_statement                   {std::cout<<"while_statement "<<std::endl;$$=$1}
           | do_while_statement                {std::cout<<"do_while_statement "<<std::endl;}
 
           | if_statement                      {std::cout<<"if_statement "<<std::endl;$$=$1;}
@@ -162,7 +163,7 @@ declaration_statement : data_type CONSTANT '=' expression    {}
 for_statement : FOR '(' declaration_statement ';' expression ';' assignment_statement ')' '{'statement_list'}'   {}
               ;
 
-while_statement : WHILE '(' expression ')'  '{' statement_list '}'    {}
+while_statement : WHILE '(' expression ')'  '{' statement_list '}'    {$$=construct_operation_node(WHILE,2,$3,$6);}
                 ;
 
 
