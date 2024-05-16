@@ -65,14 +65,13 @@ Keyword     Description
 %token <bVal> BOOL
 %token <strVal> STRING
 
-%token <conName> CONSTANT
 %token <sIdx> VARIABLE
 
 /* Keywords */
 %token IF                                                                /* Keywords for if statement */
 %token SWITCH CASE DEFAULT                                               /* Keywords for switch statement */
 %token FOR WHILE DO BREAK CONTINUE                                       /* Keywords for loops */
-%token CONST_TYPE INT_TYPE FLOAT_TYPE BOOL_TYPE STRING_TYPE              /* Keywords for data types */
+%token CONST INT_TYPE FLOAT_TYPE BOOL_TYPE STRING_TYPE              /* Keywords for data types */
 %token FUNCTION                                                          /* Keyword for function declaration */
 %token PRINT                                                             /* Keyword for print */
 
@@ -99,7 +98,7 @@ Keyword     Description
 %type <n> program statement_list statement assignment_statement 
 %type <n> function_call declaration_statement 
 %type <n> for_statement while_statement do_while_statement if_statement switch_statement cases expression
-%type <n> data_type
+%type <iVal> data_type
 
 /* End of Tokens */
 
@@ -114,11 +113,11 @@ statement_list : statement                    {$$=$1;}
                | statement_list statement     {$$=construct_operation_node(STATEMENT_LIST,2,$1,$2);}
                ;
 
-statement : assignment_statement              {std::cout<<"assignment_statement "<<std::endl;$$=$1;}
-          | declaration_statement             {std::cout<<"declaration_statement "<<std::endl;}
-          | expression                        {std::cout<<"expression "<<std::endl;$$=$1;}
+statement : assignment_statement              {std::cout<<"assignment_statement "<<std::endl;   $$=$1;}
+          | declaration_statement             {std::cout<<"declaration_statement "<<std::endl;  $$=$1;}
+          | expression                        {std::cout<<"expression "<<std::endl; $$=$1;}
 
-          | PRINT '(' expression ')'          {std::cout<<"PRINT EXP "<<std::endl;$$=construct_operation_node(PRINT,1,$3);}
+          | PRINT '(' expression ')'          {std::cout<<"PRINT EXP "<<std::endl;  $$=construct_operation_node(PRINT,1,$3);}
 
 
           | for_statement                     {std::cout<<"for_statement "<<std::endl;}
@@ -138,8 +137,7 @@ statement : assignment_statement              {std::cout<<"assignment_statement 
           ;
 
 
-assignment_statement : VARIABLE '=' expression     {$$ = construct_operation_node(ASSIGNMENT, 2, construct_identifier_node($1),$3);}
-                     | CONSTANT '=' expression    {}
+assignment_statement : VARIABLE '=' expression  {$$ = construct_operation_node(ASSIGNMENT, 2, construct_identifier_node($1),$3);}
                      ;
 
               
@@ -147,16 +145,19 @@ assignment_statement : VARIABLE '=' expression     {$$ = construct_operation_nod
 function_call : FUNCTION '(' expression ')'   {}
             ;
 
+
+
+declaration_statement : data_type VARIABLE '=' expression    { $$ = construct_operation_node('=', 2, construct_identifier_node($2, $1), $4);}
+                      | CONST data_type VARIABLE '=' expression    { $$ = construct_operation_node('=', 2, construct_identifier_node($3, $2, CONST), $5);}
+                      ;
+
+
 data_type : INT_TYPE          {$$=INT_TYPE}
-          | FLOAT_TYPE        {}
-          | BOOL_TYPE         {}
-          | STRING_TYPE       {}
-          | CONST_TYPE        {}
+          | FLOAT_TYPE        {$$=FLOAT_TYPE}
+          | BOOL_TYPE         {$$=BOOL_TYPE}
+          | STRING_TYPE       {$$=STRING_TYPE}
           ;
 
-declaration_statement : data_type VARIABLE '=' expression    { $$ = construct_operation_node('=', 2, construct_identifier_node($2,$1), $4);}
-                      | data_type CONSTANT '=' expression    {}
-                      ;
 
 /* Loops */
 for_statement : FOR '(' declaration_statement ';' expression ';' assignment_statement ')' '{'statement_list'}'   {std::cout<<"for_statement "<<std::endl; $$ = construct_operation_node(FOR, 4, $3, $5, $7, $10);}
@@ -188,12 +189,11 @@ default_statement : DEFAULT ':' statement     {}
  
 expression : 
             /*Terminal*/
-            INTEGER                    {$$ = construct_value_node( INTEGER, $1,0.0,0,NULL);}
-           | FLOAT                     {$$ = construct_value_node(FLOAT,0,$1,0,NULL);}
-           | STRING                     {$$ = construct_value_node(STRING,0,0.0,0,$1);}  
-           | BOOL                       {}
+            INTEGER                    {$$ = construct_constant_node( INTEGER, INT_TYPE,$1);}
+           | FLOAT                     {$$ = construct_constant_node( INTEGER, FLOAT_TYPE,$1);}
+           | STRING                    {$$ =  construct_constant_node( INTEGER, STRING_TYPE,$1);}  
+           | BOOL                      {$$ =  construct_constant_node( INTEGER, BOOL_TYPE,$1);}
            | VARIABLE                       {$$ = construct_identifier_node($1);}
-           | CONSTANT                               {}
            /*Negative*/
             | '-' expression %prec NEGATIVE        {$$=construct_operation_node(NEGATIVE,1,$2);}  
            /*Mathimatical*/
@@ -232,7 +232,7 @@ node *construct_constant_node(int type, int dataType, ...) {
      }
 
      /* copy information */
-     p->type = CONST;
+     p->type = CONSTANT;
      p->con.dataType = dataType;
      va_start(ap, dataType); /* initialize va */
      p->con.value = va_arg(ap, valueType); /* get value */
@@ -241,20 +241,20 @@ node *construct_constant_node(int type, int dataType, ...) {
      return p;
 }
 
-node *construct_value_node(int dataType, int intValue, float floatValue, bool boolValue,char *stringValue, bool isConstant, char *name = NULL) {
+/* node *construct_value_node(int dataType, int intValue, float floatValue, bool boolValue,char *stringValue, bool isConstant, char *name = NULL) { */
 
   
-    node *p;
+    /* node *p; */
 
     /* allocate node */
-    if ((p = (node *)malloc(sizeof(node))) == NULL)
-        yyerror("out of memory");
+    /* if ((p = (node *)malloc(sizeof(node))) == NULL)
+        yyerror("out of memory"); */
 
    
-    if(isConstant)
-    {
+    /* if(isConstant)
+    { */
         /* copy information if VALUE */
-          p->type = CONST;
+          /* p->type = CONST;
           p->con.dataType=dataType;
           p->con.name=name;
 
@@ -277,12 +277,12 @@ node *construct_value_node(int dataType, int intValue, float floatValue, bool bo
               p->con.value.stringValue = stringValue;
               break;
 
-          }
-    }
+          } */
+    /* }
     else
-    {
+    { */
          /* copy information if VALUE */
-          p->type = VALUE;
+          /* p->type = VALUE;
           p->value.type=dataType;
           switch (dataType)
           {
@@ -304,12 +304,12 @@ node *construct_value_node(int dataType, int intValue, float floatValue, bool bo
               break;
 
           }
-    }
+    } */
 
     
 
-    return p;
-}
+    /* return p;
+} */
 
 node *construct_operation_node(int oper, int nOpers, ...) {
   va_list ap; /* variable argument list */

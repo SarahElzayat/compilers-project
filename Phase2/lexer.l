@@ -42,7 +42,7 @@
 "or"                        { return OR;            }
 "not"                       { return NOT;           }
 
-"const"                     { return CONST_TYPE;       }
+"const"                     { return CONST;       }
 "int"                       { return INT_TYPE;    }
 "float"                     { return FLOAT_TYPE;  }
 "string"                    { return STRING_TYPE; }
@@ -66,9 +66,6 @@
 "def"                       { return FUNCTION; }   
 "default"                   { return DEFAULT;  }
 
-[A-Z_][A-Z0-9_]*            { 
-                               yylval.conName = strdup(yytext);
-                               return CONSTANT;  }
 
 [a-zA-Z_][a-zA-Z0-9_]*      { 
                               yylval.varName = strdup(yytext);

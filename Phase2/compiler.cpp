@@ -5,6 +5,8 @@
 #include "compiler.h"
 #include "parser.tab.h"
 
+using std::vector;
+
 static int label = 0;
 static int timeStep = 0;
 static int level = 0;
@@ -34,7 +36,7 @@ const char* get_data_type(int type){
 }
 
 
-node* construct_label_node(int value, char*name){
+node* construct_label_node(int value){
     node* p;
     size_t nodeSize;
 
@@ -46,8 +48,7 @@ node* construct_label_node(int value, char*name){
     }
 
     /* copy information */
-    p->type = CONST;
-    p->con.name = name;
+    p->type = CONSTANT;
     p->con.value.intValue = value;
     return p;
 }
@@ -68,7 +69,7 @@ void export_symbol_table(){
         {
             st = symbolsTable[i];
             fprintf(fp, "%s,%s,%s,%d,%d,%s,%s\n", st->name.c_str(), get_data_type(st->type),
-             st->symbolType == CONSTANT ? "Constant" : "Variable", st->scope, st->timestamp, st->used ? "true" : "false", st->isInitialized ? "true" : "false");
+             st->symbolType == CONST ? "Constant" : "Variable", st->scope, st->timestamp, st->used ? "true" : "false", st->isInitialized ? "true" : "false");
         }
         fclose(fp);
     }
@@ -174,28 +175,45 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
     
     switch (p->type)
     {
-        case CONST: 
-            printf("\tpush\t%d\n", p->con.value); 
-            break; 
-
-        case VALUE:
-            switch (p->value.type)
+        case CONSTANT: 
+            switch (p->con.dataType)
             {
-            case INTEGER:
-                printf("\tpush\t%d\n", p->value.intValue);
-                break;
-            case FLOAT:
-                printf("\tpush\t%f\n", p->value.floatValue);
-                break;
-            case BOOL:
-                printf("\tpush\t%f\n", p->value.boolValue);
-                break;
-            case STRING:
-                printf("\tpush\t%s\n", p->value.stringValue);
-                break;
+            case INT_TYPE:
+            printf("\tpush %s\t%d\n", get_data_type(INT_TYPE), p->con.value.intValue);
+            return INT_TYPE;
+
+            case BOOL_TYPE:
+            printf("\tpush %s\t%s\n", get_data_type(BOOL_TYPE), p->con.value.boolValue ? "true" : "false");
+            return BOOL_TYPE;
+
+            case FLOAT_TYPE:
+            printf("\tpush %s\t%f\n", get_data_type(FLOAT_TYPE), p->con.value.floatValue);
+            return FLOAT_TYPE;
+
+            case STRING_TYPE:
+            printf("\tpush %s\t%s\n", get_data_type(STRING_TYPE), p->con.value.stringValue);
+            return STRING_TYPE;
             }
-            
             break;
+
+        // case VALUE:
+        //     switch (p->value.type)
+        //     {
+        //     case INTEGER:
+        //         printf("\tpush\t%d\n", p->value.intValue);
+        //         break;
+        //     case FLOAT:
+        //         printf("\tpush\t%f\n", p->value.floatValue);
+        //         break;
+        //     case BOOL:
+        //         printf("\tpush\t%f\n", p->value.boolValue);
+        //         break;
+        //     case STRING:
+        //         printf("\tpush\t%s\n", p->value.stringValue);
+        //         break;
+        //     }
+            
+        //     break;
         //Identifiers are pushed to the stack and written to symbols table
         case ID:
             symbolTableEntry = get_identifier(p);

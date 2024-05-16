@@ -24,15 +24,15 @@ using std::map;
 
 typedef enum
 {
-    CONST,
+    CONSTANT,
     VALUE,
     ID,
     OP
 } nodeType;
 
-typedef struct
+struct valueType
 {
-    int type;
+    // int type;
     union
     {
         int intValue;
@@ -40,13 +40,12 @@ typedef struct
         bool boolValue;
         char *stringValue;
     };
-} valueType;
+};
 
 /* constants */
 typedef struct
 {
     valueType value; /* value of constant */
-    char *name;      /* name of constant */
     int dataType;        /* type of constant */
 } constantNode;
 
@@ -79,7 +78,7 @@ typedef struct nodeTypeTag
     union
     {
         constantNode con; /* constants */
-        valueType value;    /* values */
+        // valueType value;    /* values */
         idNode id;        /* identifiers */
         opNode opr;       /* operators */
     };

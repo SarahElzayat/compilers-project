@@ -43,36 +43,35 @@
      FLOAT = 259,
      BOOL = 260,
      STRING = 261,
-     CONSTANT = 262,
-     VARIABLE = 263,
-     IF = 264,
-     SWITCH = 265,
-     CASE = 266,
-     DEFAULT = 267,
-     FOR = 268,
-     WHILE = 269,
-     DO = 270,
-     BREAK = 271,
-     CONTINUE = 272,
-     CONST_TYPE = 273,
-     INT_TYPE = 274,
-     FLOAT_TYPE = 275,
-     BOOL_TYPE = 276,
-     STRING_TYPE = 277,
-     FUNCTION = 278,
-     PRINT = 279,
-     RETURN = 280,
-     IFX = 281,
-     ELSE = 282,
-     ENDLINE = 283,
-     OR = 284,
-     AND = 285,
-     NOTEQUAL = 286,
-     EQUAL = 287,
-     LESS_EQUAL = 288,
-     GREATER_EQUAL = 289,
-     NOT = 290,
-     NEGATIVE = 291
+     VARIABLE = 262,
+     IF = 263,
+     SWITCH = 264,
+     CASE = 265,
+     DEFAULT = 266,
+     FOR = 267,
+     WHILE = 268,
+     DO = 269,
+     BREAK = 270,
+     CONTINUE = 271,
+     CONST = 272,
+     INT_TYPE = 273,
+     FLOAT_TYPE = 274,
+     BOOL_TYPE = 275,
+     STRING_TYPE = 276,
+     FUNCTION = 277,
+     PRINT = 278,
+     RETURN = 279,
+     IFX = 280,
+     ELSE = 281,
+     ENDLINE = 282,
+     OR = 283,
+     AND = 284,
+     NOTEQUAL = 285,
+     EQUAL = 286,
+     LESS_EQUAL = 287,
+     GREATER_EQUAL = 288,
+     NOT = 289,
+     NEGATIVE = 290
    };
 #endif
 
@@ -100,7 +99,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 104 "parser.tab.h"
+#line 103 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
