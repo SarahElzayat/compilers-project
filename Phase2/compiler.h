@@ -20,6 +20,7 @@ using std::map;
 #define SIZEOF_NODETYPE ((char *)&p->con - (char *)p) /* size of largest type, in bytes */
 
 #define ASSIGNMENT   1
+#define STATEMENT_LIST  2
 typedef enum
 {
     CONST,

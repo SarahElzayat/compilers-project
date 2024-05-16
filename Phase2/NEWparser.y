@@ -69,7 +69,6 @@ Keyword     Description
 %token <sIdx> VARIABLE
 
 /* Keywords */
-%token STATEMENT_LIST
 %token IF                                                                /* Keywords for if statement */
 %token SWITCH CASE DEFAULT                                               /* Keywords for switch statement */
 %token FOR WHILE DO BREAK CONTINUE                                       /* Keywords for loops */
@@ -115,11 +114,11 @@ statement_list : statement                    {$$=$1;}
                | statement_list statement     {$$=construct_operation_node(STATEMENT_LIST,2,$1,$2);}
                ;
 
-statement : assignment_statement              {std::cout<<"assignment_statement "<<std::endl;}
+statement : assignment_statement              {std::cout<<"assignment_statement "<<std::endl;$$=$1;}
           | declaration_statement             {std::cout<<"declaration_statement "<<std::endl;}
           | expression                        {std::cout<<"expression "<<std::endl;$$=$1;}
 
-          | PRINT '(' expression ')'          {std::cout<<"PRINT EXP "<<std::endl;}
+          | PRINT '(' expression ')'          {std::cout<<"PRINT EXP "<<std::endl;$$=construct_operation_node(PRINT,1,$3);}
 
 
           | for_statement                     {std::cout<<"for_statement "<<std::endl;}
@@ -172,7 +171,7 @@ do_while_statement : DO '{' statement_list '}' WHILE '(' expression ')'        {
 
 /* Conditional Statement */
 if_statement : IF '(' expression ')' '{' statement_list '}' %prec IFX                         {$$=construct_operation_node(IF,2,$3,$6);}
-             | IF '(' expression ')' '{' statement_list '}'ELSE '{' statement_list  '}'       {}
+             | IF '(' expression ')' '{' statement_list '}'ELSE '{' statement_list  '}'       {$$=construct_operation_node(IF,3,$3,$6,$10);}
               ;
 
 switch_statement :  SWITCH '(' VARIABLE ')' '{' cases '}'                           {}
