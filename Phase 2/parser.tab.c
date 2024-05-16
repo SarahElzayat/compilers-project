@@ -159,8 +159,8 @@ static const short yyrhs[] = {    52,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-    99,   102,   103,   106,   107,   108,   111,   112,   113,   114,
-   115,   116,   117,   118,   121,   122,   123,   124,   125,   130,
+   101,   104,   105,   108,   109,   110,   113,   114,   115,   116,
+   117,   118,   119,   120,   123,   124,   125,   126,   127,   132,
    133,   136,   138,   139,   142,   145,   146,   147,   148,   149,
    152,   153,   157,   160,   163,   166,   167,   170,   171,   174,
    175,   176,   179,   182,   183,   184,   185,   186,   187,   188,
@@ -868,82 +868,80 @@ yyreduce:
   switch (yyn) {
 
 case 2:
-#line 102 "parser.y"
+#line 104 "parser.y"
 {execute(yyvsp[0].n);;
     break;}
 case 3:
-#line 103 "parser.y"
+#line 105 "parser.y"
 {;
     break;}
 case 4:
-#line 106 "parser.y"
-{;
-    break;}
-case 5:
-#line 107 "parser.y"
-{;
-    break;}
-case 6:
 #line 108 "parser.y"
 {;
     break;}
+case 5:
+#line 109 "parser.y"
+{;
+    break;}
+case 6:
+#line 110 "parser.y"
+{;
+    break;}
 case 7:
-#line 111 "parser.y"
-{;
-    break;}
-case 8:
-#line 112 "parser.y"
-{;
-    break;}
-case 9:
 #line 113 "parser.y"
 {;
     break;}
-case 10:
+case 8:
 #line 114 "parser.y"
 {;
     break;}
-case 11:
+case 9:
 #line 115 "parser.y"
 {;
     break;}
-case 12:
+case 10:
 #line 116 "parser.y"
 {;
     break;}
-case 13:
+case 11:
 #line 117 "parser.y"
 {;
     break;}
-case 14:
+case 12:
 #line 118 "parser.y"
 {;
     break;}
+case 13:
+#line 119 "parser.y"
+{;
+    break;}
+case 14:
+#line 120 "parser.y"
+{;
+    break;}
 case 15:
-#line 121 "parser.y"
-{;
-    break;}
-case 16:
-#line 122 "parser.y"
-{;
-    break;}
-case 17:
 #line 123 "parser.y"
 {;
     break;}
-case 18:
+case 16:
 #line 124 "parser.y"
 {;
     break;}
-case 19:
+case 17:
 #line 125 "parser.y"
 {;
     break;}
+case 18:
+#line 126 "parser.y"
+{;
+    break;}
+case 19:
+#line 127 "parser.y"
+{;
+    break;}
 case 20:
-#line 130 "parser.y"
-{
-                      yyval.n = construct_operation_node(ASSIGNMENT, 2, construct_identifier_node(yyvsp[-2].sIdx),yyvsp[0].n);
-                      ;
+#line 132 "parser.y"
+{yyval.n = construct_operation_node(ASSIGNMENT, 2, construct_identifier_node(yyvsp[-2].sIdx),yyvsp[0].n);;
     break;}
 case 21:
 #line 133 "parser.y"
@@ -951,7 +949,7 @@ case 21:
     break;}
 case 22:
 #line 136 "parser.y"
-{;
+{yyval.n = construct_operation_node(PRINT, 1,yyvsp[-1].n);;
     break;}
 case 23:
 #line 138 "parser.y"
@@ -1055,7 +1053,7 @@ case 47:
     break;}
 case 48:
 #line 186 "parser.y"
-{;
+{yyval.n=yyvsp[-1].n;
     break;}
 case 49:
 #line 187 "parser.y"
@@ -1111,7 +1109,7 @@ case 61:
     break;}
 case 62:
 #line 200 "parser.y"
-{;
+{yyval.n= construct_identifier_node(yyvsp[0].sIdx);
     break;}
 case 63:
 #line 201 "parser.y"

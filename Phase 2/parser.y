@@ -71,6 +71,8 @@ Keyword     Description
 %nonassoc IFX                                                      /* Keyword for If statement precedance handling*/
 %nonassoc ELSE                                                      /* Keyword for else statement */
 %nonassoc ENDLINE 
+///print 
+
 /* Operators */
 /* The order matters as we go down the precedence of the operator increases */
 /* left and right keywords gove  */
@@ -127,13 +129,11 @@ compound_statement : for_statement      {}
 
 
 
-assignment_statement : VARIABLE '=' expression     {
-                      $$ = construct_operation_node(ASSIGNMENT, 2, construct_identifier_node($1),$3);
-                      }
+assignment_statement : VARIABLE '=' expression     {$$ = construct_operation_node(ASSIGNMENT, 2, construct_identifier_node($1),$3);}
                      | CONSTANT '=' expression    {}
                      ;
 
-print_statement : PRINT '(' expression ')'    {}
+print_statement : PRINT '(' expression ')'    {$$ = construct_operation_node(PRINT, 1,$3);}
                 ;   
 return_expression : RETURN expression ENDLINE   {}
                   | RETURN ENDLINE                {}
@@ -183,7 +183,7 @@ expression : expression '+' expression            {$$=construct_operation_node('
            | expression '-' expression            {$$=construct_operation_node('-',2,$1,$3);}
            | expression '*' expression            {$$=construct_operation_node('*',2,$1,$3);}
            | expression '/' expression            {$$=construct_operation_node('/',2,$1,$3);}
-           | '(' expression ')'           {}
+           | '(' expression ')'                   {$$=$2}
            | NOT expression                       {$$=construct_operation_node(NOT,2,$2);}
            | expression AND expression        {$$=construct_operation_node(AND,2,$1,$3);}
            | expression OR expression         {$$=construct_operation_node(OR,2,$1,$3);}
@@ -197,7 +197,7 @@ expression : expression '+' expression            {$$=construct_operation_node('
            | FLOAT                     {$$ = construct_value_node(FLOAT,0,$1,0,NULL);}
            | CHAR                      {$$ = construct_value_node(CHAR,0,0.0,$1,NULL);}
            | STRING                     {$$ = construct_value_node(STRING,0,0.0,0,$1);}             
-           | VARIABLE                       {}
+           | VARIABLE                               {$$= construct_identifier_node($1)}
            | CONSTANT                               {}
            ;
 %%
