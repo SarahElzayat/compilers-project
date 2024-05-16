@@ -190,9 +190,9 @@ default_statement : DEFAULT ':' statement     {}
 expression : 
             /*Terminal*/
             INTEGER                    {$$ = construct_constant_node( INTEGER, INT_TYPE,$1);}
-           | FLOAT                     {$$ = construct_constant_node( INTEGER, FLOAT_TYPE,$1);}
-           | STRING                    {$$ =  construct_constant_node( INTEGER, STRING_TYPE,$1);}  
-           | BOOL                      {$$ =  construct_constant_node( INTEGER, BOOL_TYPE,$1);}
+           | FLOAT                     {$$ = construct_constant_node( FLOAT, FLOAT_TYPE,$1);}
+           | STRING                    {$$ =  construct_constant_node( STRING, STRING_TYPE,$1);}  
+           | BOOL                      {$$ =  construct_constant_node( BOOL, BOOL_TYPE,$1);}
            | VARIABLE                       {$$ = construct_identifier_node($1);}
            /*Negative*/
             | '-' expression %prec NEGATIVE        {$$=construct_operation_node(NEGATIVE,1,$2);}  

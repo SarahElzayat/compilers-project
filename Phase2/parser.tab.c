@@ -1819,21 +1819,21 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 193 "parser.y"
-    {(yyval.n) = construct_constant_node( INTEGER, FLOAT_TYPE,(yyvsp[(1) - (1)].fVal));;}
+    {(yyval.n) = construct_constant_node( FLOAT, FLOAT_TYPE,(yyvsp[(1) - (1)].fVal));;}
     break;
 
   case 40:
 
 /* Line 1455 of yacc.c  */
 #line 194 "parser.y"
-    {(yyval.n) =  construct_constant_node( INTEGER, STRING_TYPE,(yyvsp[(1) - (1)].strVal));;}
+    {(yyval.n) =  construct_constant_node( STRING, STRING_TYPE,(yyvsp[(1) - (1)].strVal));;}
     break;
 
   case 41:
 
 /* Line 1455 of yacc.c  */
 #line 195 "parser.y"
-    {(yyval.n) =  construct_constant_node( INTEGER, BOOL_TYPE,(yyvsp[(1) - (1)].bVal));;}
+    {(yyval.n) =  construct_constant_node( BOOL, BOOL_TYPE,(yyvsp[(1) - (1)].bVal));;}
     break;
 
   case 42:

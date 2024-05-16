@@ -183,7 +183,7 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
             return INT_TYPE;
 
             case BOOL_TYPE:
-            printf("\tpush %s\t%s\n", get_data_type(BOOL_TYPE), p->con.value.boolValue ? "true" : "false");
+            printf("\tpush %s\t%s\n", get_data_type(BOOL_TYPE), p->con.value.boolValue);
             return BOOL_TYPE;
 
             case FLOAT_TYPE:
