@@ -12,6 +12,7 @@ static int level = 0;
 static vector<symbolTable*> symbolsTable;
 
 const char* get_data_type(int type){
+
     switch (type) 
     {
         case INTEGER:
@@ -47,7 +48,7 @@ node* construct_label_node(int value, char*name){
     }
 
     /* copy information */
-    p->type = CONSTANT;
+    p->type = CONST;
     p->con.name = name;
     p->con.value.intValue = value;
     return p;
@@ -166,5 +167,108 @@ void remove_block_level(){
 
 int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
 {
-    return;
+    
+    if(!p)
+    return 0;
+    
+    switch (p->type)
+    {
+        case CONST: 
+            printf("\tpush\t%d\n", p->con.value); 
+            break; 
+        case VALUE:
+     
+
+            switch (p->value.type)
+            {
+            case INTEGER:
+                printf("\tpush\t%d\n", p->value.intValue);
+                break;
+            case FLOAT:
+                printf("\tpush\t%f\n", p->value.floatValue);
+                break;
+            case CHAR:
+                printf("\tpush\t%c\n", p->value.charValue);
+                break;
+            case STRING:
+                printf("\tpush\t%s\n", p->value.stringValue);
+                break;
+            }
+            
+            break;
+        case ID:
+            //TODO: check of exist // add to symbol table
+            printf("\tpush\t%s\n", p->id.name); 
+            break;;
+        case OP:
+            switch (p->opr.oper)
+            {
+                int l1,l2;
+                case WHILE:
+                    printf("L%03d:\n", l1 = label++);
+                    execute(p->opr.op[0]);
+                    printf("\tjz\tL%03d\n", l2 = label++);
+                    execute(p->opr.op[1]);
+                    printf("\tjmp\tL%03d\n", l1);
+                    printf("L%03d:\n", l2);
+                    break;
+                case IF:
+                    execute(p->opr.op[0]);
+                    if (p->opr.nops > 2) {
+                        /* if else */
+                        printf("\tjz\tL%03d\n", l1 = label++);
+                        execute(p->opr.op[1]);
+                        printf("\tjmp\tL%03d\n", l2 = label++);
+                        printf("L%03d:\n", l1);
+                        execute(p->opr.op[2]);
+                        printf("L%03d:\n", l2);
+                    } else {
+                        /* if */
+                        printf("\tjz\tL%03d\n", l1 = label++);
+                        execute(p->opr.op[1]);
+                        printf("L%03d:\n", l1);
+                    }
+                    break;
+                case SWITCH:return 0;
+                case DO:return 0;
+                case FOR:return 0;
+                case PRINT:         
+                    execute(p->opr.op[0]);
+                    printf("\tprint\n");
+                    break;
+                case OR:return 0;
+                case AND:return 0;
+                case GREATER_EQUAL:return 0;
+                case EQUAL:return 0;
+                case LESS_EQUAL:return 0;
+                case NOT : return 0;
+                case NOTEQUAL: return 0;
+                case ASSIGNMENT:
+                    execute(p->opr.op[1]);
+                    printf("\tpop\t%s\n", p->opr.op[0]->id.name);
+                    break;
+
+                //what about data types
+                        default:
+                execute(p->opr.op[0]); 
+                execute(p->opr.op[1]);
+                switch(p->opr.oper) {
+                case '+':   printf("\tadd\n"); break;
+                case '-':   printf("\tsub\n"); break; 
+                case '*':   printf("\tmul\n"); break;
+                case '/':   printf("\tdiv\n"); break;
+                case '<':   printf("\tcompLT\n"); break;
+                case '>':   printf("\tcompGT\n"); break;
+                case GREATER_EQUAL:    printf("\tcompGE\n"); break;
+                case LESS_EQUAL:    printf("\tcompLE\n"); break;
+                case NOTEQUAL:    printf("\tcompNE\n"); break;
+                case EQUAL:    printf("\tcompEQ\n"); break;
+                case OR:    printf("\tcompEQ\n"); break;
+                case AND:    printf("\tcompEQ\n"); break;
+            }
+            }
+            break;
+   
+    }
+    return 0;
 }

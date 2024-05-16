@@ -1,7 +1,7 @@
 /* Part 1 : Definitions */
 %{
-    // #include "parser.tab.h"
     #include "compiler.h"
+    #include "parser.tab.h"
     #include <stdbool.h>
 %}
 

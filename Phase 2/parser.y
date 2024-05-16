@@ -1,5 +1,4 @@
-/* Part 1 : Definitions */
-%{
+%{  
     #include <stdio.h>
     #include "compiler.h"
     #include <stdbool.h>
@@ -14,6 +13,8 @@
     int yylex(void);
     void yyerror(const char *msg);
 %}
+
+
 /* End of Definitions */
 
 
@@ -63,7 +64,7 @@ Keyword     Description
 %token IF                                                 /* Keywords for if statement */
 %token SWITCH CASE DEFAULT                                          /* Keywords for switch statement */
 %token FOR WHILE DO BREAK CONTINUE                                  /* Keywords for loops */
-%token CONST INT_TYPE FLOAT_TYPE BOOL_TYPE CHAR_TYPE STRING_TYPE    /* Keywords for data types */
+%token CONST_TYPE INT_TYPE FLOAT_TYPE BOOL_TYPE CHAR_TYPE STRING_TYPE    /* Keywords for data types */
 %token FUNCTION                                                     /* Keyword for function declaration */
 %token PRINT                                                        /* Keyword for print */
 %nonassoc RETURN
@@ -98,104 +99,106 @@ Keyword     Description
 program : statement_list
         ;
 
-statement_list : statement
-               | statement_list statement
+statement_list : statement                  {execute($1);}
+               | statement_list statement     {}
                ;
 
-statement : simple_statement
-          | compound_statement
-          | '{' statement_list '}'
+statement : simple_statement                  {}
+          | compound_statement                 {}
+          | '{' statement_list '}'              {}
           ;
 
-simple_statement : assignment_statement
-                 | declaration_statement
-                 | expression
-                 | function_call
-                 | print_statement
-                 | return_expression
-                 | BREAK
-                 | CONTINUE
+simple_statement : assignment_statement         {}
+                 | declaration_statement        {}
+                 | expression                   {}
+                 | function_call                {}
+                 | print_statement               {}
+                 | return_expression              {}    
+                 | BREAK                          {}
+                 | CONTINUE                 {}
                  ;
 
-compound_statement : for_statement
-                   | while_statement
-                   | if_statement
-                   | do_while_statement
-                   | switch_statement
+compound_statement : for_statement      {}
+                   | while_statement      {}
+                   | if_statement         {}
+                   | do_while_statement     {}
+                   | switch_statement     {}
                    ;
 
 
-assignment_statement : VARIABLE '=' expression
-                     | CONSTANT '=' expression
+
+assignment_statement : VARIABLE '=' expression     {
+                      $$ = construct_operation_node(ASSIGNMENT, 2, construct_identifier_node($1),$3);
+                      }
+                     | CONSTANT '=' expression    {}
                      ;
 
-print_statement : PRINT '(' expression ')' 
+print_statement : PRINT '(' expression ')'    {}
                 ;   
- 
-return_expression : RETURN expression ENDLINE
-                  | RETURN ENDLINE
+return_expression : RETURN expression ENDLINE   {}
+                  | RETURN ENDLINE                {}
                   ;
 
-function_call : FUNCTION '(' expression ')'
+function_call : FUNCTION '(' expression ')'   {}
             ;
 
-data_type : INT_TYPE
-          | FLOAT_TYPE
-          | BOOL_TYPE
-          | CHAR_TYPE
-          | STRING_TYPE
+data_type : INT_TYPE      {}
+          | FLOAT_TYPE    {}
+          | BOOL_TYPE   {}
+          | CHAR_TYPE     {}
+          | STRING_TYPE     {}
           ;
 
-declaration_statement : CONST data_type CONSTANT '=' expression
-                      | data_type VARIABLE '=' expression
+declaration_statement : CONST_TYPE data_type CONSTANT '=' expression    {}
+                      | data_type VARIABLE '=' expression             {}
                       ;
 
 
-for_statement : FOR '(' declaration_statement ';' expression ';' assignment_statement ')' statement
+for_statement : FOR '(' declaration_statement ';' expression ';' assignment_statement ')' statement   {}
               ;
 
-while_statement : WHILE '(' expression ')' statement
+while_statement : WHILE '(' expression ')' statement    {}
                 ;
 
-do_while_statement : DO statement WHILE '(' expression ')'
-                   ;
+do_while_statement : DO statement WHILE '(' expression ')'        {}
+                    ;
 
-if_statement : IF '(' expression ')' statement %prec IFX
-             | IF '(' expression ')' statement ELSE statement
+if_statement : IF '(' expression ')' statement %prec IFX              {}
+             | IF '(' expression ')' statement ELSE statement         {}
              ;
 
-switch_statement :  SWITCH '(' VARIABLE ')' '{' cases '}'
-                 |  SWITCH '(' VARIABLE ')' '{' cases  default_statement'}'
+switch_statement :  SWITCH '(' VARIABLE ')' '{' cases '}'                           {}
+                 |  SWITCH '(' VARIABLE ')' '{' cases  default_statement'}'           {}
                  ;
 
-cases : CASE INTEGER ':' statement cases
-      | CASE BOOL ':' statement cases
-      |
+cases : CASE INTEGER ':' statement cases                  {}
+      | CASE BOOL ':' statement cases           {}
+      |                                           {}
       ;
 
-default_statement : DEFAULT ':' statement
+default_statement : DEFAULT ':' statement     {}
 
  
-expression : expression '+' expression 
-           | expression '-' expression 
-           | expression '*' expression 
-           | expression '/' expression 
-           | '(' expression ')' 
-           | NOT expression
-           | expression AND expression
-           | expression OR expression
-           | expression GREATER_EQUAL expression
-           | expression LESS_EQUAL expression
-           | expression EQUAL expression
-           | expression NOTEQUAL expression
-           | expression '<' expression
-           | expression '>' expression     
-           | INTEGER
-           | FLOAT
-           | CHAR
-           | STRING                   
-           | VARIABLE                  
-           | CONSTANT
+expression : expression '+' expression      {$$=construct_operation_node('+',2,$1,$3);}
+           | expression '-' expression      {$$=construct_operation_node('-',2,$1,$3);}
+           | expression '*' expression        {}
+           | expression '/' expression          {}
+           | '(' expression ')'           {}
+           | NOT expression       {}
+           | expression AND expression        {}
+           | expression OR expression         {}
+           | expression GREATER_EQUAL expression    {}
+           | expression LESS_EQUAL expression     {}
+           | expression EQUAL expression      {}
+           | expression NOTEQUAL expression   {}
+           | expression '<' expression          {}
+           | expression '>' expression         {}
+           | INTEGER                    {$$ = construct_value_node( INTEGER, $1,0.0,0,NULL);}
+           | FLOAT                     {$$ = construct_value_node(FLOAT,0,$1,0,NULL);}
+           | CHAR                      {$$ = construct_value_node(CHAR,0,0.0,$1,NULL);}
+           | STRING                     {$$ = construct_value_node(STRING,0,0.0,0,$1);}             
+           | VARIABLE                       {}
+           | CONSTANT                               {}
            ;
 %%
 /* End of Production Rules */
@@ -203,41 +206,80 @@ expression : expression '+' expression
 
 /* Part 5 : Functions and Main */
 node *construct_constant_node(int type, int dataType, ...) {
-    va_list ap; /* variable argument list */
-    node *p;
-    size_t nodeSize;
+    // va_list ap; /* variable argument list */
+    // node *p;
+    // size_t nodeSize;
 
-    /* allocate Node */
-    nodeSize = SIZEOF_NODETYPE + sizeof(constantNode);
-    if ((p = (Node*)malloc(nodeSize)) == NULL)
-    {
+    // /* allocate Node */
+    // nodeSize = SIZEOF_NODETYPE + sizeof(constantNode);
+    // if ((p = (node*)malloc(nodeSize)) == NULL)
+    // {
+    //     yyerror("out of memory");
+    // }
+
+    // /* copy information */
+    // p->type = CONST;
+    // p->con.dataType = dataType;
+    // va_start(ap, dataType); /* initialize va */
+    // p->con.value = va_arg(ap, valType); /* get value */
+    // va_end(ap); /* clean up va */
+
+    // return p;
+}
+
+node *construct_value_node(int dataType,int intValue, float floatValue, char charValue, char *stringValue) {
+
+  
+    node *p;
+
+    /* allocate node */
+    if ((p = (node *)malloc(sizeof(node))) == NULL)
         yyerror("out of memory");
-    }
 
     /* copy information */
-    p->type = CONSTANT;
-    p->con.dataType = dataType;
-    va_start(ap, dataType); /* initialize va */
-    p->con.value = va_arg(ap, valType); /* get value */
-    va_end(ap); /* clean up va */
+    p->type = VALUE;
+    p->value.type=dataType;
+
+    switch (dataType)
+    {
+      
+      case INTEGER:
+  
+        p->value.intValue = intValue;
+        
+        break;
+      case FLOAT:
+        p->value.floatValue = floatValue;
+        
+        break;
+      case CHAR:
+        p->value.charValue = charValue;
+        
+
+        break;
+      case STRING:
+        p->value.stringValue = stringValue;
+        break;
+        /* case BOOL:
+        p->value.boolValue = 0.0;
+        break; */
+    }
 
     return p;
 }
 
-node *construct_op_node(int oper, int nOpers, ...) {
+node *construct_operation_node(int oper, int nOpers, ...) {
   va_list ap; /* variable argument list */
   node *p;
   size_t nodeSize;
   int i = 0;
   
-  /* allocate Node */
   nodeSize = SIZEOF_NODETYPE + sizeof(opNode) +
     (nOpers - 1) * sizeof(node*);
-  if ((p = (Node*)malloc(nodeSize)) == NULL)
+  if ((p = (node*)malloc(nodeSize)) == NULL)
   {
     yyerror("out of memory");
   }
-    
 
   /* copy information */
   p->type = OP;
@@ -253,10 +295,9 @@ node *construct_op_node(int oper, int nOpers, ...) {
   return p;
 }
 
-node *construct_id_node(char* i, int dataType, int qualifier) {
+node *construct_identifier_node(char* i, int dataType, int qualifier) {
   node *p;
   size_t nodeSize;
-  /* allocate Node */
   nodeSize = SIZEOF_NODETYPE + sizeof(idNode);
   if ((p = (node*)malloc(nodeSize)) == NULL)
     yyerror("out of memory");

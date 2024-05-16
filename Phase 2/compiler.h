@@ -1,3 +1,6 @@
+#ifndef COMPILER_H
+#define COMPILER_H
+
 /* Add Types Here*/
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,6 +9,9 @@
 #include <map>
 #include <string.h>
 #include <string>
+#include <stdarg.h>
+#include <iostream>
+
 
 using std::string;
 using std::vector;
@@ -13,15 +19,18 @@ using std::map;
 
 #define SIZEOF_NODETYPE ((char *)&p->con - (char *)p) /* size of largest type, in bytes */
 
+#define ASSIGNMENT   1
 typedef enum
 {
-    CONSTANT,
+    CONST,
+    VALUE,
     ID,
     OP
 } nodeType;
 
 typedef struct
 {
+    int type;
     union
     {
         int intValue;
@@ -40,6 +49,12 @@ typedef struct
     int dataType;        /* type of constant */
     int qualifier;       /* qualifier of constant */
 } constantNode;
+
+/* constants */
+/**
+valueNode("string", sValue ="vaslsa,dsad");
+valueNode("string", sValue ="vaslsa,dsad");
+
 
 /* variables */
 typedef struct
@@ -64,6 +79,7 @@ typedef struct nodeTypeTag
     union
     {
         constantNode con; /* constants */
+        valueType value;    /* values */
         idNode id;        /* identifiers */
         opNode opr;       /* operators */
     };
@@ -92,7 +108,16 @@ struct symbolTable
 //Define Functions prototypes
 static vector<map<string, symbolTable*> > symbol(1, map<string, symbolTable*>()); //Map {name: pointer to a symbolTable object}
 extern node* construct_constant_node(int value);
+extern node *construct_operation_node(int oper, int nOpers, ...);
+extern node *construct_identifier_node(int oper, int nOpers, ...);
+extern node *construct_value_node(int dataType,int intValue, float floatValue, char charValue, char *stringValue);
+
 extern void get_unused_variables();
 
 extern void free_node(node* p);
 extern void yyerror(const char* s);
+
+
+
+
+#endif
