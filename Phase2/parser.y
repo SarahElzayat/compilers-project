@@ -110,7 +110,7 @@ Keyword     Description
 /* program : statement_list   {execute($1);free_node($1); std::cout<<"program "<<std::endl;exit(0);}
         ; */
 
-program : functions   {check_unused();}
+program : functions   { /*last thing to finish*/check_unused();}
         ;
 
 functions: functions statement {execute($2); free_node($2); }

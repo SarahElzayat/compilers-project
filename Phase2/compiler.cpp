@@ -82,7 +82,6 @@ void export_symbol_table(){
         free(st);
     }
     fclose(f);
-    return;
 }
 
 

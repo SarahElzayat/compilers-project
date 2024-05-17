@@ -1575,7 +1575,7 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 113 "parser.y"
-    {check_unused();;}
+    { /*last thing to finish*/check_unused();;}
     break;
 
   case 3:
