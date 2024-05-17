@@ -81,9 +81,9 @@ int yywrap(void) {
     return 1;
 }
 
-void yyerror(const char *s) {
-  fprintf(stderr, "Line %d: %s\n", yylineno, s);
-  exit(0);
-}
+// void yyerror(const char *s) {
+//   fprintf(stderr, "Line %d: %s\n", yylineno, s);
+//   exit(0);
+// }
 
 /* Part 3 : Functions and Main*/

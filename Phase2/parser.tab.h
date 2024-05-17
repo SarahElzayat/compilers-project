@@ -41,38 +41,41 @@
    enum yytokentype {
      INTEGER = 258,
      FLOAT = 259,
-     BOOL = 260,
-     STRING = 261,
+     STRING = 260,
+     BOOL = 261,
      VARIABLE = 262,
      IF = 263,
      SWITCH = 264,
      CASE = 265,
      DEFAULT = 266,
-     FOR = 267,
-     WHILE = 268,
-     DO = 269,
-     BREAK = 270,
-     CONTINUE = 271,
-     CONST = 272,
-     INT_TYPE = 273,
-     FLOAT_TYPE = 274,
-     BOOL_TYPE = 275,
-     STRING_TYPE = 276,
-     VOID_TYPE = 277,
-     FUNCTION = 278,
-     PRINT = 279,
-     RETURN = 280,
-     IFX = 281,
-     ELSE = 282,
-     ENDLINE = 283,
-     OR = 284,
-     AND = 285,
-     NOTEQUAL = 286,
-     EQUAL = 287,
-     LESS_EQUAL = 288,
-     GREATER_EQUAL = 289,
-     NOT = 290,
-     NEGATIVE = 291
+     SWITCH_BODY = 267,
+     FOR = 268,
+     WHILE = 269,
+     DO = 270,
+     REPEAT = 271,
+     BREAK = 272,
+     CONTINUE = 273,
+     CONST = 274,
+     INT_TYPE = 275,
+     FLOAT_TYPE = 276,
+     BOOL_TYPE = 277,
+     STRING_TYPE = 278,
+     VOID_TYPE = 279,
+     DECLARE_ONLY = 280,
+     FUNCTION = 281,
+     PRINT = 282,
+     RETURN = 283,
+     BLOCK = 284,
+     IFX = 285,
+     ELSE = 286,
+     OR = 287,
+     AND = 288,
+     NOT_EQUAL = 289,
+     EQUAL = 290,
+     LESS_EQUAL = 291,
+     GREATER_EQUAL = 292,
+     NOT = 293,
+     NEGATIVE = 294
    };
 #endif
 
@@ -83,23 +86,21 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 32 "parser.y"
+#line 30 "parser.y"
 
-    int iVal;              /*   integer       */
-    float fVal;            /*   float         */
-    bool bVal;             /*   boolean       */
-    char *strVal;          /*   string        */
+  int intValue;                          /* integer  */
+  float floatValue;                      /* double   */
+  char* stringValue;                     /* string   */
+  bool boolValue;                        /* boolean  */
 
-    char *varName;         /*   variable      */
-
-    char *sIdx;            /*   symbol table  */
-
-    node *n;               /*   node          */
+  char *sIndex;                       /* symbol table index */
+  char *varType;                      /* variable type      */
+  Node *nodePtr;                      /*   node             */
 
 
 
 /* Line 1676 of yacc.c  */
-#line 103 "parser.tab.h"
+#line 104 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
