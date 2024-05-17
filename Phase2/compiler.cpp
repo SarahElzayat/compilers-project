@@ -54,26 +54,26 @@ node* construct_label_node(int value){
 }
 
 void export_symbol_table(){
-    FILE* fp;
+    FILE* f;
     symbolTable* st;
     int i;
 
-    if ((fp = fopen("./outputs/symbolTable.txt", "w")) == NULL)
+    if ((f = fopen("./outputs/symbolTable.txt", "w")) == NULL)
     {
         yyerror("cannot open symbolTable.txt");
     }
     else
     {
-        fprintf(fp, "Name\t Data Type\t Symbol Type\t Scope\t Time Stamp\t Used\t Initialized\n");
+        fprintf(f, "Name\t Data Type\t Symbol Type\t Scope\t Time Stamp\t Used\t Initialized\n");
         for (i = 0; i < symbolsTable.size(); i++)
         {
             st = symbolsTable[i];
-            fprintf(fp, "%s,%s,%s,%d,%d,%s,%s\n", st->name.c_str(), get_data_type(st->type),
-             st->symbolType == CONST ? "Constant" : "Variable", st->scope, st->timestamp, st->used ? "true" : "false", st->isInitialized ? "true" : "false");
+            fprintf(f, "%s,%s,%s,%d,%d,%s,%s\n", st->name.c_str(), get_data_type(st->type),
+            st->symbolType == CONST ? "Constant" : "Variable", st->scope, st->timestamp, st->used ? "true" : "false", st->isInitialized ? "true" : "false");
+            free(st);
         }
-        fclose(fp);
+        fclose(f);
     }
-    return;
 }
 
 symbolTable* get_identifier(node* p, bool isRHS = false) {
@@ -95,14 +95,14 @@ symbolTable* get_identifier(node* p, bool isRHS = false) {
             if (isRHS && entry->symbolType == CONST) //Check if the identifier is a constant
             {
                 char msg[1024];
-                sprintf(msg, "ERROR: Can't assign value to constant '%s'", p->id.name);
+                sprintf(msg, "ERROR: Can't Change a CONSTANT '%s'", p->id.name);
                 yyerror(msg);
                 return NULL;
             }
             if (!isRHS && entry->isInitialized == false) //Check if the identifier is initialized
             {
                 char msg[1024];
-                sprintf(msg, "ERROR: Can't use an uninitialized identifier '%s'", p->id.name);
+                sprintf(msg, "ERROR: Using uninitialized identifier '%s'", p->id.name);
                 yyerror(msg);
                 return NULL;
             }
@@ -225,10 +225,10 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
         case ID:
 
             symbolTableEntry = get_identifier(p);
-            // if (symbolTableEntry == NULL)
-            // {
-            //     return 0;
-            // }
+            if (symbolTableEntry == NULL)
+            {
+                return 0;
+            }
             printf("\tpush\t%s\n", p->id.name); 
             return symbolTableEntry->type;
 
@@ -343,13 +343,6 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
                         execute(p->opr.op[2]->opr.op[0]);
                         printf("\tjmp\tL%03d\n",endLabel);
                     }
-                    
-                   
-                    
-                   
-
-
-
                     printf("L%03d:\n", l1=endLabel);
                     break;
 
@@ -402,13 +395,13 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
 
                     rhs = execute(p->opr.op[0]); 
                     lhs = execute(p->opr.op[1]);
-                    if(rhs != lhs)
-                    {
-                        char msg[1024];
-                        sprintf(msg, "ERROR: MISMATCH Operands data types");
-                        yyerror(msg);
-                        return 0;
-                    }
+                    // if(rhs != lhs)
+                    // {
+                    //     char msg[1024];
+                    //     sprintf(msg, "ERROR: MISMATCH Operands data types");
+                    //     yyerror(msg);
+                    //     return 0;
+                    // }
                     switch(p->opr.oper) 
                     {
                         case '+':

@@ -25,7 +25,7 @@ using std::map;
 typedef enum
 {
     CONSTANT,
-    VALUE,
+    // VALUE,
     ID,
     OP
 } nodeType;

@@ -1,1 +1,0 @@
-Name	 Data Type	 Symbol Type	 Scope	 Time Stamp	 Used	 Initialized
