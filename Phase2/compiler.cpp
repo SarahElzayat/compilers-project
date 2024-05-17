@@ -170,6 +170,13 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
     node* lblNode;
     symbolTable* symbolTableEntry = NULL;
 
+    node*n;
+    node* switch_var;
+
+    int l1, l2, l3;
+    int rhs, lhs;
+    int endLabel, defaultLabel;
+
     if(!p)
     return 0;
     
@@ -216,23 +223,24 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
         //     break;
         //Identifiers are pushed to the stack and written to symbols table
         case ID:
+
             symbolTableEntry = get_identifier(p);
-            if (symbolTableEntry == NULL)
-            {
-                return 0;
-            }
+            // if (symbolTableEntry == NULL)
+            // {
+            //     return 0;
+            // }
             printf("\tpush\t%s\n", p->id.name); 
             return symbolTableEntry->type;
 
         case OP:
-            int l1,l2,l3;
-            int rhs, lhs;
+            
             switch (p->opr.oper)
             {
                 case STATEMENT_LIST:
                     execute(p->opr.op[0]);
                     execute(p->opr.op[1]);
                     break;
+                
 
                 /*WHILE LOOP*/
                 case WHILE:
@@ -292,8 +300,58 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
 
                 /*SWITCH CASE*/
                 case SWITCH:
-                
-                return 0;
+                    //add_block_level();
+                    label++;
+                    endLabel=11111;
+                    defaultLabel=999;
+                    // Execute the switch expression
+                    switch_var=p->opr.op[0];
+                    printf("\tpop %s\t\n",switch_var->id.name);
+                    n=p->opr.op[1];
+                    // printf("%d",n->opr.op[2]->opr.nops);
+                    while(n->opr.oper==CASE){
+                        bool last_case=false;
+                        if (n->opr.nops==3)
+                        {
+                            last_case=true;
+                        }
+                        printf("L%03d:\n", l1=label);
+                        printf("\tpush\t%s\n",switch_var->id.name);
+                        execute(n->opr.op[0]);
+                        printf("\tcompEQ\t\n");
+                        if (last_case){
+                            if (p->opr.nops==3){
+                                printf("\tjz\tL%03d\n",l1=defaultLabel);
+                            }else{
+                                printf("\tjz\tL%03d\n",l1=endLabel);
+                            }  
+                        }else {
+                            printf("\tjz\tL%03d\n",l1=++label);
+                        }
+                        execute(n->opr.op[1]);
+                        printf("\tjmp\tL%03d\n",endLabel);
+                        if(last_case){
+                           
+                            break;
+                        }else{
+                            n=n->opr.op[3];
+                        }
+                        
+                    }
+                    if (p->opr.nops==3){
+                        printf("L%03d:\n", l1=defaultLabel);
+                        execute(p->opr.op[2]->opr.op[0]);
+                        printf("\tjmp\tL%03d\n",endLabel);
+                    }
+                    
+                   
+                    
+                   
+
+
+
+                    printf("L%03d:\n", l1=endLabel);
+                    break;
 
                 /*DO WHILE LOOP*/
                 case DO:

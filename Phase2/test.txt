@@ -1,4 +1,1 @@
-int x = 5
-float t = 5.3
-string y = "w"
-bool f = true
+x+2

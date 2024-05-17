@@ -97,7 +97,7 @@ Keyword     Description
 /* Non Terminal Types */
 %type <n> program statement_list statement assignment_statement 
 %type <n> function_call declaration_statement 
-%type <n> for_statement while_statement do_while_statement if_statement switch_statement cases expression
+%type <n> for_statement while_statement do_while_statement if_statement switch_statement cases expression default_statement
 %type <iVal> data_type
 
 /* End of Tokens */
@@ -132,7 +132,7 @@ statement : assignment_statement              {std::cout<<"assignment_statement 
           | RETURN ENDLINE                    {std::cout<<"RETURN "<<std::endl;}
           | RETURN expression ENDLINE         {std::cout<<"RETURN EXP "<<std::endl;}
 
-          | BREAK                             {std::cout<<"BREAK "<<std::endl;}
+          | BREAK                             {std::cout<<"BREAK "<<std::endl;construct_operation_node(BREAK,0)}
           | CONTINUE                          {std::cout<<"CONTINUE "<<std::endl;}
           ;
 
@@ -175,16 +175,17 @@ if_statement : IF '(' expression ')' '{' statement_list '}' %prec IFX           
              | IF '(' expression ')' '{' statement_list '}'ELSE '{' statement_list  '}'       {$$=construct_operation_node(IF,3,$3,$6,$10);}
               ;
 
-switch_statement :  SWITCH '(' VARIABLE ')' '{' cases '}'                           {}
-                 |  SWITCH '(' VARIABLE ')' '{' cases  default_statement'}'           {}
+switch_statement :  SWITCH '(' VARIABLE ')' '{' cases '}'                           {$$=construct_operation_node(SWITCH,2,construct_identifier_node($3),$6);}
+                 |  SWITCH '(' VARIABLE ')' '{' cases  default_statement'}'          {$$=construct_operation_node(SWITCH,3,construct_identifier_node($3),$6,$7);}
                  ;
 
-cases : CASE INTEGER ':' statement cases                  {}
-      | CASE BOOL ':' statement cases           {}
-      |                                           {}
+cases : CASE INTEGER ':' statement BREAK cases                  {$$=construct_operation_node(CASE,4,construct_constant_node(INTEGER,INT_TYPE,$2),$4,construct_operation_node(BREAK,0),$6);}
+      | CASE BOOL ':' statement BREAK cases                     {}
+      | CASE INTEGER ':' statement  BREAK                 {$$=construct_operation_node(CASE,3,construct_constant_node(INTEGER,INT_TYPE,$2),$4,construct_operation_node(BREAK,0));}
       ;
 
-default_statement : DEFAULT ':' statement     {}
+default_statement : DEFAULT ':' statement     {$$=construct_operation_node(DEFAULT,1,$3);}
+                  ;
  
  
 expression : 
@@ -193,7 +194,7 @@ expression :
            | FLOAT                     {$$ = construct_constant_node( FLOAT, FLOAT_TYPE,$1);}
            | STRING                    {$$ =  construct_constant_node( STRING, STRING_TYPE,$1);}  
            | BOOL                      {$$ =  construct_constant_node( BOOL, BOOL_TYPE,$1);}
-           | VARIABLE                       {$$ = construct_identifier_node($1);}
+           | VARIABLE                  {$$ = construct_identifier_node($1);}
            /*Negative*/
             | '-' expression %prec NEGATIVE        {$$=construct_operation_node(NEGATIVE,1,$2);}  
            /*Mathimatical*/
