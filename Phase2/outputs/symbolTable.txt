@@ -1,3 +1,2 @@
-Name	 Data Type	 Symbol Type	 Scope	 Time Stamp	 Used	 Initialized
-,		,		Variable,		0,		0,		false,		true
-,		,		Variable,		0,		1,		false,		true
+Name,	DataType,	Qualifier,	TimeStep,	Scope,	Initialized,	Used
+x,		int, 		Variable, 		0, 		0, 		True, 		False

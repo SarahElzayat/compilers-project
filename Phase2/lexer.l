@@ -1,26 +1,24 @@
-/* Part 1 : Definitions */
 %{
     #include "compiler.h"
     #include "parser.tab.h"
     #include <stdbool.h>
-    void yyerror (const char *msg); 
+    void yyerror (const char *emsg); 
     int line=1;
 %}
 
 %option yylineno
-
 /* End of Definitions */
 
 
 /* Part 2 : Regular Expressions */
 %%
 [0-9]+                       { /* INTEGERS */ 
-                              yylval.iVal = atoi(yytext); 
+                              yylval.intValue = atoi(yytext); 
                               return INTEGER; }
 
 (0|[1-9][0-9]*)\.[0-9]*     { /* FLOATS */ 
                               char * x = strdup(yytext); // to ensure null-terminated string
-                              yylval.fVal = atof(x);
+                              yylval.floatValue = atof(x);
                               return FLOAT; }
 "true"                      { /* BOOLS */ 
                               // yylval.bVal = 1;
@@ -28,7 +26,6 @@
 "false"                     {/* BOOLS */ 
                               // yylval.bVal = 0;
                                return BOOL; }
-                               
 "const"                     { return CONST;       }
 "int"                       { return INT_TYPE;    }
 "float"                     { return FLOAT_TYPE;  }
@@ -40,12 +37,12 @@
 "return"                    { return RETURN; }
 
 
-[-()<>=+*/{}.:;]             { return yytext[0]; }
+[-()<>=+*/%{}.:;]             { return yytext[0]; }
 
 ">="                        { return GREATER_EQUAL; }
 "<="                        { return LESS_EQUAL;    }
 "=="                        { return EQUAL;         } 
-"!="                        { return NOTEQUAL;      }
+"!="                        { return NOT_EQUAL;      }
 
 "and"                       { return AND;           }
 "or"                        { return OR;            }
@@ -73,11 +70,11 @@
 "continue"                  { return CONTINUE; }
 
 [a-zA-Z_][a-zA-Z0-9_]*      { 
-                              yylval.varName = strdup(yytext);
+                              yylval.sIndex = strdup(yytext);
                               return VARIABLE;  }
   
-\".*\"                      { 
-                              yylval.strVal = strdup(yytext);
+\".*\"                      {
+                              yylval.stringValue = strdup(yytext);
                               return STRING;    }
 
 [ \t\r]+  { /* ignore whitespace */ }
@@ -103,7 +100,3 @@
 int yywrap(void) {
     return 1;
 }
-
-
-
-
