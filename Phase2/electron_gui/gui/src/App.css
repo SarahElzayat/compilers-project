@@ -1,0 +1,78 @@
+* {
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.App {
+  font-family: Arial, sans-serif;
+  background-color: #252424;
+  height: 100vh;
+  /* margin: 0 10px; */
+}
+
+h3 {
+  /* color: #fdd3ab; */
+  /* color: #d19a66; */
+  color: #ccc;
+  padding: 0 15px;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #2d2d2d;
+}
+
+.editor-header svg {
+  color: #0082cf;
+  border: none;
+  cursor: pointer;
+  font-size: 1.3rem;
+  margin-right: 1rem;
+}
+
+.editor {
+  margin: 1rem;
+}
+
+.monaco-editor,
+.overflow-guard {
+  border-radius: 10px;
+  margin: 15px;
+}
+
+/* editor with focus */
+.editor:focus {
+  outline: none;
+}
+
+textarea::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+/* textarea::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 1px #d19a66f9;
+} */
+
+textarea::-webkit-scrollbar-thumb {
+  background-color: #8888886d;
+  border: #d19a66;
+  border-radius: 1rem;
+}
+
+.output {
+  height: calc(100vh - 50vh - 150px);
+  background: #1e1e1e;
+  color: #d19a66;
+  border: none;
+  padding: 10px;
+  width: 48vw;
+  resize: none;
+  border-radius: 10px;
+  margin: 15px 0 0 15px;
+}
+
+.output:focus {
+  outline: none;
+}
