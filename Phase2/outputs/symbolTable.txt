@@ -1,2 +1,8 @@
 Name,	DataType,	Qualifier,	TimeStep,	Scope,	Initialized,	Used
-x,		int, 		Variable, 		0, 		0, 		True, 		False
+x,		int, 		Variable, 		0, 		0, 		True, 		True
+y,		int, 		Variable, 		1, 		0, 		True, 		True
+y,		int, 		Variable, 		1, 		0, 		True, 		True
+y,		int, 		Variable, 		1, 		0, 		True, 		True
+y,		int, 		Variable, 		1, 		0, 		True, 		True
+y,		int, 		Variable, 		1, 		0, 		True, 		True
+y,		int, 		Variable, 		1, 		0, 		True, 		True

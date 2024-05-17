@@ -62,7 +62,7 @@ textarea::-webkit-scrollbar-thumb {
 }
 
 .output {
-  height: calc(100vh - 50vh - 150px);
+  height: calc(100vh - 50vh - 160px);
   background: #1e1e1e;
   color: #d19a66;
   border: none;

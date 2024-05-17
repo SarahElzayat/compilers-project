@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const { exec } = require("child_process");
+const fs = require("fs");
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -32,13 +33,26 @@ app.on("activate", () => {
 
 ipcMain.handle("run-compiler", async (event, input) => {
   return new Promise((resolve, reject) => {
-    const command = `echo "${input}" | .\\compiler.exe`; // Adjust the command for Windows
+    // write the input to file
+    fs.writeFileSync("input.txt", input);
+
+    const command = `.\\compiler.exe < .\\input.txt`;
     console.log(command);
     exec(command, (error, stdout, stderr) => {
       if (error) {
         reject(new Error(stderr));
       } else {
-        resolve(stdout);
+        // resolve(stdout);
+
+        // read symbolTable and errors from outputs folder
+        const symTable = fs.readFileSync("outputs/symbolTable.txt", "utf-8");
+        const errors = fs.readFileSync("outputs/errors.txt", "utf-8");
+
+        console.log(symTable);
+        console.log(errors);
+
+        // return the output, symbol table and errors
+        resolve({ quadruples: stdout, symTable, errors });
       }
     });
   });

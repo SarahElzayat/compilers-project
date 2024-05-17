@@ -1,5 +1,11 @@
 	push int	5
 	push int	5
+	push int	5
+	push int	5
+	push int	5
+	push int	5
+	push int	5
+	push int	5
 	push	x
 	push	y
 	add
