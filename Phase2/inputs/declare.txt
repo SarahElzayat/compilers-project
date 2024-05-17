@@ -1,0 +1,18 @@
+# Declare all types
+
+int x = 5
+float y = 3.87
+string z = " hello world "
+bool is = true
+
+print(x)
+print(y)
+print(z)
+print(is)
+
+#Declare without initializing
+
+int a
+float b 
+string c 
+bool d 

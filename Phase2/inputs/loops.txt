@@ -1,0 +1,24 @@
+int x = 0
+
+# While Loop
+while(x == 0)
+{
+    x = 1
+    print("inside while")
+}
+
+# Do While Loop
+
+do
+{
+    x = 1
+    print("inside do")
+}
+while(x == 0)
+
+
+# For Loop
+for (int x = 0; x ==1; x = x+1)
+{
+    print("inside for")
+}

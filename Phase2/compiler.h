@@ -1,23 +1,24 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
-/* Add Types Here*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <vector>
-#include <map>
+
 #include <string.h>
 #include <string>
 #include <stdarg.h>
+
 #include <iostream>
 
+#include <vector>
+#include <map>
 
-using std::string;
-using std::vector;
-using std::map;
+using namespace std;
 
-#define SIZEOF_NODETYPE ((char *)&p->con - (char *)p) /* size of largest type, in bytes */
+/* Add All Types and structs Here*/
+#define NODESIZE ((char *)&p->con - (char *)p) /* size of largest type, in bytes */
 
 #define ASSIGNMENT   1
 #define STATEMENT_LIST  2
@@ -45,30 +46,26 @@ struct valueType
 /* constants */
 typedef struct
 {
-    valueType value; /* value of constant */
-    int dataType;        /* type of constant */
+    valueType value;     /* value */
+    int dataType;        /* type */
 } constantNode;
 
-/* constants */
-/**
-valueNode("string", sValue ="vaslsa,dsad");
-valueNode("string", sValue ="vaslsa,dsad");
 
 
 /* variables */
 typedef struct
 {
-    char *name; /* name of variable */
-    int dataType;   /* type of id */
-    int qualifier;  /* qualifier of id */
+    char *name;     /* name */
+    int dataType;   /* type */
+    int qualifier;  /* qualifier*/
 } idNode;
 
 /* operators */
 typedef struct
 {
-    int oper;                  /* operator */
-    int nops;                  /* number of operands */
-    struct nodeTypeTag *op[1]; /* operands, extended at runtime */
+    int oper;                       /* symbol */
+    int nops;                       /* number of operands */
+    struct nodeTypeTag *op[1];      /* operands, extended at runtime */
 } opNode;
 
 typedef struct nodeTypeTag
@@ -78,7 +75,6 @@ typedef struct nodeTypeTag
     union
     {
         constantNode con; /* constants */
-        // valueType value;    /* values */
         idNode id;        /* identifiers */
         opNode opr;       /* operators */
     };
@@ -98,18 +94,18 @@ struct symbolTable
   //Constructor
   symbolTable(std::string name, int type, int sType, int scope, int timeStamp, bool init)
   {
-    name = name, type = type, symbolType = sType, scope = scope, timestamp = timeStamp;
-    used = false;
     isInitialized = init;
+    used = false;
+    name = name, type = type, symbolType = sType, scope = scope, timestamp = timeStamp;
   }
 };
 
 //Define Functions prototypes
-static vector<map<string, symbolTable*> > symbol(1, map<string, symbolTable*>()); //Map {name: pointer to a symbolTable object}
+static vector<map<string, symbolTable*> > symbol(1, map<string, symbolTable*>()); //Map {levels: pointer to a symbolTable object}
+
 extern node* construct_constant_node(int value);
 extern node *construct_operation_node(int oper, int nOpers, ...);
 extern node *construct_identifier_node(int oper, int nOpers, ...);
-extern node *construct_value_node(int dataType,int intValue, float floatValue, char charValue, char *stringValue);
 
 extern void get_unused_variables();
 
