@@ -34,6 +34,9 @@ ipcMain.handle("run-compiler", async (event, input) => {
   return new Promise((resolve, reject) => {
     // write the input to file
     fs.writeFileSync("input.txt", input);
+    // clear symbol table and errors
+    fs.writeFileSync("outputs/symbolTable.txt", "");
+    fs.writeFileSync("outputs/errors.txt", "");
 
     const command = `.\\compiler.exe < .\\input.txt`;
     console.log(command);
