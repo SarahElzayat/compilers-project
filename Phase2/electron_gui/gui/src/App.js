@@ -1,5 +1,5 @@
 import Editor from "@monaco-editor/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FaPlay } from "react-icons/fa";
 import "./App.css";
 import DataTable from "./components/table";

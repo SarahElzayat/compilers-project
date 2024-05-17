@@ -5,8 +5,7 @@ const fs = require("fs");
 
 function createWindow() {
   const win = new BrowserWindow({
-    // width: 800,
-    // height: 600,
+    icon: "./logo.png",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"), // Ensure this path is correct
       contextIsolation: true,
