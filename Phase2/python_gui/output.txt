@@ -1,0 +1,4 @@
+PRINT EXP 
+	push string	"aah"
+	print
+program 

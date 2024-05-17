@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Compiler GUI</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        textarea { width: 100%; height: 100px; }
+        #output { width: 100%; height: 200px; }
+        button { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Compiler GUI</h1>
+    <label for="input">Input:</label>
+    <textarea id="input"></textarea>
+    <button onclick="runCompiler()">Run Compiler</button>
+    <h2>Output:</h2>
+    <textarea id="output" readonly></textarea>
+
+    <script src="index.js"></script>
+</body>
+</html>
