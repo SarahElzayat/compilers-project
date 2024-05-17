@@ -1,45 +1,41 @@
+
 int f = 2;
 
-# If Then
+# If Only
 if(f == 1)
 {
-    print(" f = 1")
-}
-
-if(f == 2)
-{
-    print(" f = 2")
+    print(" f = 1");
 }
 
 
 # If Else
 if(f == 1)
 {
-    print("f = 1")
+    print("f = 1");
 }
 else
 {
-    print("f != 1")
+    print("f != 1");
 }
 
 
 # If Else If
 if(f == 1)
 {
-    print("f = 1")
+    print("f = 1");
 }
 else if (f == 2)
 {
-    print("f = 2")
+    print("f = 2");
 }
 
 # Switch Case
 switch(f)
 {
     case 1:
-        print("f = 1")
+        print("f = 1");
     case 2:
-        print("f = 1")
+        print("f = 1");
     default:
-        print("f != 1 and != 2")
+        print("f != 1 and != 2");
 }

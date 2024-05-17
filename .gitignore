@@ -1,2 +1,5 @@
 Phase 1/*.tab.*
 Phase 1/*.exe
+Phase2/*.tab.*
+Phase2/outputs/*.txt
+node_modules

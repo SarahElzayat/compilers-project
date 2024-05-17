@@ -1,19 +1,7 @@
+int a = 3;
 
-int x = 5;
-int y = 5;
-# Addition
-print(x+y);
-
-# Subtraction
-print(x-y);
-
-# Multiplication
-print(x*y);
-
-# Division
-print(x/y);
-
-# Values
-print(5+2/2);
-
-#Logic
+switch(a):
+{
+    case :
+    
+}

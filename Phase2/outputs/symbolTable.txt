@@ -1,8 +1,3 @@
-Name,	DataType,	Qualifier,	TimeStep,	Scope,	Initialized,	Used
-x,		int, 		Variable, 		0, 		0, 		True, 		True
-y,		int, 		Variable, 		1, 		0, 		True, 		True
-y,		int, 		Variable, 		1, 		0, 		True, 		True
-y,		int, 		Variable, 		1, 		0, 		True, 		True
-y,		int, 		Variable, 		1, 		0, 		True, 		True
-y,		int, 		Variable, 		1, 		0, 		True, 		True
-y,		int, 		Variable, 		1, 		0, 		True, 		True
+Name,	DataType,	Qualifier,	TimeStep,	Scope,	Initialized,	Used,	 Function
+x,		int, 		Variable, 		0, 		0, 		True, 		True, 		False 
+y,		int, 		Variable, 		1, 		0, 		True, 		True, 		False 

@@ -1,0 +1,12 @@
+int a = 3;
+int b = 3;
+
+def void test (int x,int y)
+{
+    print("ana gowa test");
+    return;
+}
+
+test(a,b);
+
+int yasmin =2;

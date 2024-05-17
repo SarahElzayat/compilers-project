@@ -1,19 +1,24 @@
-	push int	5
-	push int	5
+	push int	3
+	push int	2
 	push	x
 	push	y
 	add
+	print
 	push	x
 	push	y
 	sub
+	print
 	push	x
 	push	y
 	mul
+	print
 	push	x
 	push	y
 	div
+	print
 	push int	5
 	push int	2
 	push int	2
 	div
 	add
+	print
