@@ -72,6 +72,7 @@ Keyword     Description
 
 %nonassoc IFX
 %nonassoc ELSE
+%nonassoc FUNC
 
 /* End of Tokens */
 
@@ -89,12 +90,12 @@ Keyword     Description
 
 
 /* Non Terminal Types */
-%type <nodePtr> statement statement_list  expression  rhs_nexted_expression
+%type <nodePtr> statement statement_list  expression  rhs_nested_expression
 %type <nodePtr> declaration_statement  assignment_statement functions
 %type <nodePtr> for_statement for_declaration for_mid_stmt for_assignment   
 %type <nodePtr> while_statement if_statement do_while_statement switch_statement
 %type <nodePtr> switch_body cases default_statement case_statement
-/* %type <nodePtr> function_declaration parameter_list */
+%type <nodePtr> function_declaration parameter_list function_call return_statement comma_expressions 
 %type <intValue> data_type
 
 
@@ -104,7 +105,7 @@ Keyword     Description
 program: functions      { /*last thing to finish*/ check_unused_variables();}
         ;
 
-functions: functions statement { execute_all($2); free_node($2); }
+functions: functions statement { execute_all($2); /*free_node($2);*/ }
           | {$$ = NULL;}
           ;
 
@@ -120,22 +121,35 @@ statement: ';'                                 { $$ = construct_operation_node('
           | do_while_statement                 { /*std::cout<<"do_while_statement "<<std::endl;*/ $$ = $1; }
           | for_statement                      { /*std::cout<<"for_statement "<<std::endl;*/ $$ = $1; }
           
+          | function_call                      {std::cout<<"function_call "<<std::endl;}
+          | function_declaration               {std::cout<<"function_declaration "<<std::endl;}
+          | return_statement                    { /*std::cout<<"return_statement "<<std::endl;*/ $$ = $1; }
+
           | if_statement                       { /*std::cout<<"if_statement "<<std::endl;*/ $$ = $1; }
           | switch_statement                   { /*std::cout<<"switch_statement "<<std::endl;*/ $$ = $1; }
           | '{' statement_list '}'             { /*std::cout<<"statement_list_block "<<std::endl;*/ $$ = construct_operation_node(BLOCK, 1, $2);; }
           | BREAK ';'                          { /*std::cout<<"BREAK "<<std::endl;*/ $$ = construct_operation_node(BREAK, 1, NULL); }
-          | CONTINUE ';'                       { /*std::cout<<"CONTINUE "<<std::endl;*/$$ = construct_operation_node(CONTINUE, 1, NULL); }
+          | CONTINUE ';'                       { /*std::cout<<"CONTINUE "<<std::endl;*/$$ = construct_operation_node(CONTINUE, 1, NULL); } 
           ;
 
 /* Functions */
-/* function_declaration: FUNCTION data_type VARIABLE'(' parameter_list')' '{'statement '}'  {$$=construct_operation_node(FUNCTION,4,$2,construct_identifier_node($3),$5,$8);}
+function_declaration: FUNCTION declaration_statement'('parameter_list')' '{'statement  return_statement'}'  {$$=construct_operation_node(FUNCTION,4,$2,$4,$7,$8);}
 
 parameter_list: declaration_statement ',' parameter_list          {$$=construct_operation_node(COMMA,2,$1,$3);}
               | declaration_statement                              {$$=$1;}
               |{$$=NULL}
-              ; */
+              ;
 
+function_call : VARIABLE '(' comma_expressions ')' ';'   {$$=construct_operation_node(CALL,2,construct_identifier_node($1),$3)}
+            ; 
 
+return_statement: RETURN statement { $$ = construct_operation_node(RETURN, 1, $2); }
+                ;
+                
+comma_expressions: expression ',' comma_expressions { $$ = construct_operation_node(COMMA, 2, $1, $3); }
+                | expression                        { $$ = $1; }
+                |                                   { $$ = NULL; }
+                ;
 /* Loops */
 while_statement:
   WHILE '(' expression ')' statement { $$ = construct_operation_node(WHILE, 2, $3, $5); }
@@ -182,8 +196,8 @@ for_mid_stmt:
   | expression { $$ = $1; }
   ;
 
-assignment_statement: 
-  VARIABLE '=' rhs_nexted_expression { $$ = construct_operation_node('=', 2, construct_identifier_node($1), $3); }
+assignment_statement: VARIABLE '=' function_call %prec FUNC { $$ = construct_operation_node('=', 2, construct_identifier_node($1), $3); }
+                      | VARIABLE '=' rhs_nested_expression { $$ = construct_operation_node('=', 2, construct_identifier_node($1), $3); }
   ;
 
 for_assignment:
@@ -191,11 +205,10 @@ for_assignment:
   | assignment_statement { $$ = $1; }
   ;
 
-declaration_statement:
-  data_type VARIABLE { $$ = construct_operation_node(DECLARE_ONLY, 1, construct_identifier_node($2, $1)); }
-  | data_type VARIABLE '=' rhs_nexted_expression { $$ = construct_operation_node('=', 2, construct_identifier_node($2, $1), $4); }
-  | CONST data_type VARIABLE '=' rhs_nexted_expression { $$ = construct_operation_node('=', 2, construct_identifier_node($3, $2, CONST), $5); }
-  ;
+declaration_statement: data_type VARIABLE                                             { $$ = construct_operation_node(DECLARE_ONLY, 1, construct_identifier_node($2, $1)); }
+                    | data_type VARIABLE '=' rhs_nested_expression                    { $$ = construct_operation_node('=', 2, construct_identifier_node($2, $1), $4); }
+                    | CONST data_type VARIABLE '=' rhs_nested_expression              { $$ = construct_operation_node('=', 2, construct_identifier_node($3, $2, CONST), $5); }
+                    ;
 
 data_type: INT_TYPE       { $$ = INT_TYPE } 
           | FLOAT_TYPE    { $$ = FLOAT_TYPE }
@@ -209,39 +222,37 @@ for_declaration:
   | declaration_statement { $$ = $1; }
   ;
 
-rhs_nexted_expression:
-  expression { $$ = $1; }
-  | VARIABLE '=' rhs_nexted_expression { $$ = construct_operation_node('=', 2, construct_identifier_node($1), $3); }
-  | '(' VARIABLE '=' rhs_nexted_expression ')' { $$ = construct_operation_node('=', 2, construct_identifier_node($2), $4); }
-  ;
+rhs_nested_expression: expression                                          { $$ = $1; }
+                      | VARIABLE '=' rhs_nested_expression                 { $$ = construct_operation_node('=', 2, construct_identifier_node($1), $3); }
+                      | '(' VARIABLE '=' rhs_nested_expression ')'         { $$ = construct_operation_node('=', 2, construct_identifier_node($2), $4); }
+                      ;
 
-statement_list:
-  statement { $$ = $1; }
-  | statement_list statement { $$ = construct_operation_node(';', 2, $1, $2); }
-  ;
+statement_list: statement                                                   { $$ = $1; }
+              | statement_list statement                                    { $$ = construct_operation_node(';', 2, $1, $2); }
+              ;
 
-expression: INTEGER { $$ = construct_constant_node(INTEGER, INT_TYPE, $1); }
-          | FLOAT { $$ = construct_constant_node(FLOAT, FLOAT_TYPE, $1); }
-          | STRING { $$ = construct_constant_node(STRING, STRING_TYPE, $1); }
-          | VARIABLE { $$ = construct_identifier_node($1); }
-          | BOOL { $$ = construct_constant_node(BOOL, BOOL_TYPE, $1); }
-          | '-' expression %prec NEGATIVE { $$ = construct_operation_node(NEGATIVE, 1, $2); }
-          | NOT expression { $$ = construct_operation_node(NOT, 1, $2); }
-          | expression '+' expression { $$ = construct_operation_node('+', 2, $1, $3); }
-          | expression '-' expression { $$ = construct_operation_node('-', 2, $1, $3); }
-          | expression '*' expression { $$ = construct_operation_node('*', 2, $1, $3); }
-          | expression '/' expression { $$ = construct_operation_node('/', 2, $1, $3); }
-          | expression '%' expression { $$ = construct_operation_node('%', 2, $1, $3); }
-          | expression '<' expression { $$ = construct_operation_node('<', 2, $1, $3); }
-          | expression '>' expression { $$ = construct_operation_node('>', 2, $1, $3); }
-          | expression GREATER_EQUAL expression { $$ = construct_operation_node(GREATER_EQUAL, 2, $1, $3); }
-          | expression LESS_EQUAL expression { $$ = construct_operation_node(LESS_EQUAL, 2, $1, $3); }
-          | expression NOT_EQUAL expression { $$ = construct_operation_node(NOT_EQUAL, 2, $1, $3); }
-          | expression EQUAL expression { $$ = construct_operation_node(EQUAL, 2, $1, $3); }
-          | expression AND expression { $$ = construct_operation_node(AND, 2, $1, $3); }
-          | expression OR expression { $$ = construct_operation_node(OR, 2, $1, $3); }
-          | '(' expression ')' { $$ = $2; }
-          ;
+
+expression: INTEGER                                          { $$ = construct_constant_node(INTEGER, INT_TYPE, $1); }
+          | FLOAT                                            { $$ = construct_constant_node(FLOAT, FLOAT_TYPE, $1); }
+          | STRING                                           { $$ = construct_constant_node(STRING, STRING_TYPE, $1); }
+          | VARIABLE                                         { $$ = construct_identifier_node($1); }
+          | BOOL                                             { $$ = construct_constant_node (BOOL, BOOL_TYPE, $1); }
+          | '-' expression %prec NEGATIVE                    { $$ = construct_operation_node(NEGATIVE, 1, $2); }
+          | NOT expression                                   { $$ = construct_operation_node(NOT, 1, $2); }
+          | expression '+' expression                        { $$ = construct_operation_node('+', 2, $1, $3); }
+          | expression '-' expression                        { $$ = construct_operation_node('-', 2, $1, $3); }
+          | expression '*' expression                        { $$ = construct_operation_node('*', 2, $1, $3); }
+          | expression '/' expression                        { $$ = construct_operation_node('/', 2, $1, $3); }
+          | expression '%' expression                        { $$ = construct_operation_node('%', 2, $1, $3); }
+          | expression '<' expression                        { $$ = construct_operation_node('<', 2, $1, $3); }
+          | expression '>' expression                        { $$ = construct_operation_node('>', 2, $1, $3); }
+          | expression GREATER_EQUAL expression              { $$ = construct_operation_node(GREATER_EQUAL, 2, $1, $3); }
+          | expression LESS_EQUAL expression                 { $$ = construct_operation_node(LESS_EQUAL, 2, $1, $3); }
+          | expression NOT_EQUAL expression                  { $$ = construct_operation_node(NOT_EQUAL, 2, $1, $3); }
+          | expression EQUAL expression                      { $$ = construct_operation_node(EQUAL, 2, $1, $3); }
+          | expression AND expression                        { $$ = construct_operation_node(AND, 2, $1, $3); }
+          | expression OR expression                         { $$ = construct_operation_node(OR, 2, $1, $3); }
+          | '(' expression ')'                               { $$ = $2; }          ;
   /* End of Production Rules */
 
 %%

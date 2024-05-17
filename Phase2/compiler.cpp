@@ -64,6 +64,27 @@ const char* get_data_type(int type) {
   }
 }
 
+SymbolTable* get_function_variable(Node*p)
+{
+    printf("Function name: %s\n", p->id.name);
+    printf("fagf");
+    printf("Lttttt %s\n", symbol[1][p->id.name]);
+    
+    for (int i = level; i >= 0; i--) 
+    { 
+        if (symbol[i].find(p->id.name) != symbol[i].end()) 
+        {
+            SymbolTable* entry = symbol[i][p->id.name];
+            if (entry->isFunction == true) 
+            {
+                printf("www %s\n", entry->name);
+                return entry;
+            }
+        }
+    }
+    return NULL;
+
+}
 
 SymbolTable* check_identifier(Node* p, bool isRHS = false) {
   if (p->type != IDENTIFIER) return NULL;
@@ -74,13 +95,13 @@ SymbolTable* check_identifier(Node* p, bool isRHS = false) {
     if (symbol[i].find(p->id.name) != symbol[i].end()) 
     {
       SymbolTable* entry = symbol[i][p->id.name];
-      if (isRHS && entry->symbolType == CONST) {
+      if (isRHS && entry->symbolType == CONST  && entry->isFunction == false) {
         char msg[1024];
         sprintf(msg, "Semantic ERROR: Cannot assign value to a constant variable '%s'", p->id.name);
         yyerror(msg);
         return NULL;
       }
-      if (!isRHS && entry->isInitialized == false) {
+      if (!isRHS && entry->isInitialized == false && entry->isFunction == false) {
         char msg[1024];
         sprintf(msg, "Semantic ERROR: Usage of variable without initializing it '%s'", p->id.name);
         yyerror(msg);
@@ -119,7 +140,7 @@ void add_block_scope_level() {
   level++;
 }
 void remove_block_scope_level() {
-  check_unused_variables();
+//   check_unused_variables();
   symbol.pop_back();
   level--;
 }
@@ -287,6 +308,8 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
 
           remove_block_scope_level();
           break;
+
+      
 		 /*SWITCH CASE*/
 			case SWITCH:
 				open_file();
@@ -345,7 +368,7 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
 				execute_all(p->opr.op[0], l1, l2 = label++);  //body
 				type1 = execute_all(p->opr.op[1]);  //condition
 				if (type1 != BOOL_TYPE) {
-					yyerror("Semantic ERROR: RCondition must be of a BOOL value");
+					yyerror("Semantic ERROR: Condition must be of a BOOL value");
 				}
 				printf("\tjnz\tL%03d\n", l1); //if true repeat
 				printf("L%03d:\n", l2);
@@ -354,13 +377,14 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
 				break;
         
         case PRINT:
-					open_file();
-          execute_all(p->opr.op[0], cont, brk);
-          printf("\tprint\n");
-          break;
+			open_file();
+            execute_all(p->opr.op[0], cont, brk);
+            printf("\tprint\n");
+            fprintf(assemblyOutFile, "\tprint\n");
+            break;
 
         case '=':
-					open_file();
+		  open_file();
           type1 = execute_all(p->opr.op[1]);
           if (p->opr.op[1]->type == OPERATION && p->opr.op[1]->opr.symbol == '=') // variable assignment
           {
@@ -381,10 +405,10 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
           return symbolTableEntry->type;
 
         case NEGATIVE:
-					open_file();
-          type1 = execute_all(p->opr.op[0]);
-          printf("\tneg\n");
-          return type1;
+		    open_file();
+            type1 = execute_all(p->opr.op[0]);
+            printf("\tneg\n");
+            return type1;
 
         case NOT:
 					open_file();
@@ -428,7 +452,62 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
           remove_block_scope_level();
           break;
 
-		// end of line 
+    /*FUNCTIONS*/
+        case FUNCTION:
+            open_file();
+            add_block_scope_level();
+            //std::cout<<"executing a function\n";
+            //add name of function to symbol table
+            symbolTableEntry = declare_identifier(p->opr.op[0]->opr.op[0], true);
+            symbolTableEntry->isFunction = true;
+            printf("\tproc\t%s\n",p->opr.op[0]->opr.op[0]->id.name);
+            fprintf(assemblyOutFile, "\tproc\t%s\n",p->opr.op[0]->opr.op[0]->id.name);
+
+            printf("func type %s\n",get_data_type(symbolTableEntry->type));
+
+            if(p->opr.op[1]){
+              execute_all(p->opr.op[1]);
+            }
+            execute_all(p->opr.op[2]);
+            execute_all(p->opr.op[3]);
+            remove_block_scope_level();
+
+            
+            return symbolTableEntry->type;
+            break;
+
+    /*FUNCTION CALL*/
+        case CALL :
+            execute_all(p->opr.op[1]);
+            // while(){
+
+            // }
+            //symbolTableEntry = get_function_variable(p->opr.op[0]); 
+            // open_file();
+            // symbolTableEntry = get_function_variable(p->opr.op[0]);
+            printf("\tcall\t%s \n",p->opr.op[0]->id.name);
+            fprintf(assemblyOutFile, "\tcall\t%s\n",p->opr.op[0]->id.name);
+            // return symbolTableEntry->type;
+            break;
+
+        case COMMA:
+            open_file();
+        
+                execute_all(p->opr.op[0]);
+                execute_all(p->opr.op[1]);
+            break;
+
+        case RETURN:
+
+            printf("\tret\t\n");
+            fprintf(assemblyOutFile, "\tret\t\n");            
+            
+            execute_all(p->opr.op[0]);
+            printf("\tendproc\t\n");
+            fprintf(assemblyOutFile, "\tendproc\t\n");
+            break;
+            
+        /*SemiColon end of line*/
         case ';':
           for (int i = 0; i < p->opr.nops; i++)
             execute_all(p->opr.op[i], cont, brk);
@@ -436,7 +515,7 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
 
 		//what about other operations
         default:
-					open_file();
+		  open_file();
 		//execute the left and right operands they have to be same type
           type1 = execute_all(p->opr.op[0], cont, brk);
           type2 = execute_all(p->opr.op[1], cont, brk);
@@ -453,50 +532,62 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
 				printf("\tadd\n");
 				fprintf(assemblyOutFile, "\tadd\n");
 				return type1;
+
 			case '-':
 				printf("\tsub\n");
 				fprintf(assemblyOutFile, "\tsub\n");
 				return type1;
+
 			case '*':
 				printf("\tmul\n");
 				fprintf(assemblyOutFile, "\tmul\n");
 				return type1;
+
 			case '/':
 				printf("\tdiv\n");
 				fprintf(assemblyOutFile, "\tdiv\n");
 				return type1;
+
 			case '%':
 				printf("\tmod\n");
 				fprintf(assemblyOutFile, "\tmod\n");
 				return type1;
+
 			case '<':
 				printf("\tcompLT\n");
 				fprintf(assemblyOutFile, "\tcompLT\n");
 				return BOOL_TYPE;
+
 			case '>':
 				printf("\tcompGT\n");
 				fprintf(assemblyOutFile, "\tcompGT\n");
 				return BOOL_TYPE;
+
 			case GREATER_EQUAL:
 				printf("\tcompGE\n");
 				fprintf(assemblyOutFile, "\tcompGE\n");
 				return BOOL_TYPE;
+
 			case LESS_EQUAL:
 				printf("\tcompLE\n");
 				fprintf(assemblyOutFile, "\tcompLE\n");
 				return BOOL_TYPE;
+
 			case NOT_EQUAL:
 				printf("\tcompNE\n");
 				fprintf(assemblyOutFile, "\tcompNE\n");
 				return BOOL_TYPE;
+
 			case EQUAL:
 				printf("\tcompEQ\n");
 				fprintf(assemblyOutFile, "\tcompEQ\n");
 				return BOOL_TYPE;
+
 			case AND:
 				printf("\tand\n");
 				fprintf(assemblyOutFile, "\tand\n");
 				return BOOL_TYPE;
+
 			case OR:
 				printf("\tor\n");
 				fprintf(assemblyOutFile, "\tor\n");
@@ -529,15 +620,18 @@ void log_symbol_table() {
   int i;
 
   if ((f = fopen(".\\outputs\\symbolTable.txt", "w")) == NULL)
+  {
     yyerror("can't open symbolTable.txt");
-  fprintf(f, "Name,\tDataType,\tQualifier,\tTimeStep,\tScope,\tInitialized,\tUsed\n");
+  }
+    
+  fprintf(f, "Name,\tDataType,\tQualifier,\tTimeStep,\tScope,\tInitialized,\tUsed,\t Function\n");
   for (i = 0; i < symbolTable.size(); i++) 
 	{
-    st = symbolTable[i];
-    fprintf(f, "%s,\t\t%s, \t\t%s, \t\t%d, \t\t%d, \t\t%s, \t\t%s\n", 
-		 st->name.c_str(), get_data_type(st->type), st->symbolType == CONST ? "Constant" : "Variable", st->timestamp, st->scope, st->isInitialized == true? "True" : "False", st->used== true? "True" : "False");
-    free(st);
-  }
+        st = symbolTable[i];
+        fprintf(f, "%s,\t\t%s, \t\t%s, \t\t%d, \t\t%d, \t\t%s, \t\t%s, \t\t%s \n", 
+            st->name.c_str(), get_data_type(st->type), st->symbolType == CONST ? "Constant" : "Variable", st->timestamp, st->scope, st->isInitialized == true? "True" : "False", st->used== true? "True" : "False", st->isFunction== true? "True" : "False");
+        free(st);
+    }
   fclose(f);
 }
 

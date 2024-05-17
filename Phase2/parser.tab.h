@@ -68,14 +68,15 @@
      BLOCK = 284,
      IFX = 285,
      ELSE = 286,
-     OR = 287,
-     AND = 288,
-     NOT_EQUAL = 289,
-     EQUAL = 290,
-     LESS_EQUAL = 291,
-     GREATER_EQUAL = 292,
-     NOT = 293,
-     NEGATIVE = 294
+     FUNC = 287,
+     OR = 288,
+     AND = 289,
+     NOT_EQUAL = 290,
+     EQUAL = 291,
+     LESS_EQUAL = 292,
+     GREATER_EQUAL = 293,
+     NOT = 294,
+     NEGATIVE = 295
    };
 #endif
 
@@ -100,7 +101,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 104 "parser.tab.h"
+#line 105 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

@@ -22,6 +22,8 @@ using namespace std;
 
 #define ASSIGNMENT   1
 #define STATEMENT_LIST  2
+#define COMMA 3
+#define CALL 4
 
 
 typedef enum
@@ -96,11 +98,13 @@ struct SymbolTable
   int timestamp;        //Timestamp:    {time of creation}
   bool used;            //Used:         {true, false}
   bool isInitialized;   //Initialized:  {true, false}
-  SymbolTable(std::string nm, int ty, int sty, int sc, int ts, bool init)
+  bool isFunction;      //isFunction:   {true, false}
+  SymbolTable(std::string nm, int ty, int sty, int sc, int ts, bool init, bool func = false)
   {
     name = nm, type = ty, symbolType = sty, scope = sc, timestamp = ts;
     used = false;
     isInitialized = init;
+    isFunction = func;
   }
 };
 

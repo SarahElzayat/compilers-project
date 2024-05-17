@@ -1,24 +1,23 @@
-int x = 0
+int x = 0;
 
 # While Loop
 while(x == 0)
 {
-    x = 1
-    print("inside while")
+    x = 1;
+    print("inside while");
 }
 
-# Do While Loop
-
+# Do Repeat Loop
 do
 {
-    x = 1
-    print("inside do")
+    x = 1;
+    print("inside do");
 }
-while(x == 0)
+repeat(x == 0);
 
 
 # For Loop
 for (int x = 0; x ==1; x = x+1)
 {
-    print("inside for")
+    print("inside for");
 }

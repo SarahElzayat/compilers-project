@@ -1,18 +1,20 @@
 
+int x= 3;
+int y = 2;
 
 # Addition
-print(x+y)
+print(x+y);
 
 # Subtraction
-print(x-y)
+print(x-y);
 
 # Multiplication
-print(x*y)
+print(x*y);
 
 # Division
-print(x/y)
+print(x/y);
 
 # Values
-print(5+2/2)
+print(5+2/2);
 
-#Logic
+
