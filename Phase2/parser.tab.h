@@ -61,9 +61,9 @@
      VOID_TYPE = 277,
      FUNCTION = 278,
      PRINT = 279,
-     IFX = 280,
-     ELSE = 281,
-     RETURN = 282,
+     RETURN = 280,
+     IFX = 281,
+     ELSE = 282,
      ENDLINE = 283,
      OR = 284,
      AND = 285,
@@ -83,7 +83,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 28 "parser.y"
+#line 32 "parser.y"
 
     int iVal;              /*   integer       */
     float fVal;            /*   float         */
@@ -91,13 +91,15 @@ typedef union YYSTYPE
     char *strVal;          /*   string        */
 
     char *varName;         /*   variable      */
+
     char *sIdx;            /*   symbol table  */
+
     node *n;               /*   node          */
 
 
 
 /* Line 1676 of yacc.c  */
-#line 101 "parser.tab.h"
+#line 103 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

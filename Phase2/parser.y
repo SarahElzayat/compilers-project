@@ -6,6 +6,9 @@
     //----------------------------------------------
     //Function Prototypes
     extern void export_symbol_table();
+    extern void log_errors(int, int);
+    extern void check_unused();
+    //----------------------------------------------
     node *construct_operation_node(int oper, int nops, ...);
     node *construct_identifier_node(char*, int = -1, int = -1);
     node *construct_constant_node(int, int, ...);
@@ -16,7 +19,8 @@
 
     //----------------------------------------------
     int yylex(void);
-    void yyerror(const char *msg);
+    void yyerror(const char *emsg);
+    extern int line;
 %}
 
 /* End of Definitions */
@@ -32,7 +36,9 @@
     char *strVal;          /*   string        */
 
     char *varName;         /*   variable      */
+
     char *sIdx;            /*   symbol table  */
+
     node *n;               /*   node          */
 }
 
@@ -70,10 +76,10 @@ Keyword     Description
 %token FUNCTION                                                          /* Keyword for function declaration */
 %token PRINT                                                             /* Keyword for print */
 
-%nonassoc IFX                                                       /* Keyword for If statement precedance handling*/
-%nonassoc ELSE                                                      /* Keyword for else statement */
 
 %nonassoc RETURN
+%nonassoc IFX                                                       /* Keyword for If statement precedance handling*/
+%nonassoc ELSE                                                      /* Keyword for else statement */
 %nonassoc ENDLINE 
 
 
@@ -87,14 +93,12 @@ Keyword     Description
 %left '+' '-'
 %left '*' '/'
 %right NOT
-
 %nonassoc NEGATIVE
 
 /* Non Terminal Types */
-%type <n> program statement_list statement  
-%type <n> function_call assignment_statement declaration_statement nested_rhs_expression
+%type <n> program statement_list statement  functions
+%type <n> function_call declaration_statement  assignment_statement nested_rhs_assignment_statement
 %type <n> for_statement while_statement do_while_statement if_statement switch_statement cases expression default_statement
-
 %type <iVal> data_type
 
 /* End of Tokens */
@@ -106,29 +110,25 @@ Keyword     Description
 /* program : statement_list   {execute($1);free_node($1); std::cout<<"program "<<std::endl;exit(0);}
         ; */
 
-program : statement_list  {$$=$1;}
+program : functions   {check_unused();}
         ;
-/* statement_list : statement                    {$$=$1;}
-               | statement_list statement     {$$=construct_operation_node(STATEMENT_LIST,2,$1,$2);}
-               ; */
 
-statement_list : statement_list statement     { execute($2); free_node($2); }
-                | {$$ = NULL;}
-               ;
+functions: functions statement {execute($2); free_node($2); }
+          |  {$$=NULL;} 
+          ;
 
-statement :ENDLINE                            {std::cout<<"ENDLINE "<<std::endl;} 
+statement : ENDLINE                           {std::cout<<"Endline "<<std::endl;$$ = construct_operation_node(ENDLINE,1, NULL,NULL);} 
           | expression                        {std::cout<<"expression "<<std::endl; $$=$1;}
-          
-          | PRINT expression                  {std::cout<<"PRINT EXP "<<std::endl;  $$=construct_operation_node(PRINT,1,$2);}
-          
+
           | assignment_statement              {std::cout<<"assignment_statement "<<std::endl;   $$=$1;}
           | declaration_statement             {std::cout<<"declaration_statement "<<std::endl;  $$=$1;}
 
+          | PRINT expression          {std::cout<<"PRINT EXP "<<std::endl;  $$=construct_operation_node(PRINT,1,$2);}
 
 
           | for_statement                     {std::cout<<"for_statement "<<std::endl;}
-          | while_statement                   {std::cout<<"while_statement "<<std::endl;$$=$1}
-          | do_while_statement                {std::cout<<"do_while_statement "<<std::endl;}
+          | while_statement                   {std::cout<<"while_statement "<<std::endl;    $$=$1}
+          | do_while_statement                {std::cout<<"do_while_statement "<<std::endl; $$=$1}
 
           | if_statement                      {std::cout<<"if_statement "<<std::endl;$$=$1;}
           | switch_statement                  {std::cout<<"switch_statement "<<std::endl;}
@@ -138,30 +138,36 @@ statement :ENDLINE                            {std::cout<<"ENDLINE "<<std::endl;
           | RETURN ENDLINE                    {std::cout<<"RETURN "<<std::endl;}
           | RETURN expression ENDLINE         {std::cout<<"RETURN EXP "<<std::endl;}
 
-          | BREAK                             {std::cout<<"BREAK "<<std::endl; construct_operation_node(BREAK,1, NULL)}
-          | CONTINUE                          {std::cout<<"CONTINUE "<<std::endl; construct_operation_node(CONTINUE,1, NULL)}
+          | BREAK                             {std::cout<<"BREAK "<<std::endl;  construct_operation_node(BREAK,1,NULL)}
+          | CONTINUE                          {std::cout<<"CONTINUE "<<std::endl; construct_operation_node(CONTINUE,1,NULL)}
           ;
 
-function_call : FUNCTION '(' expression ')'   {}
-            ;
 
+statement_list : statement                    {$$=$1;}
+               | statement_list statement     {$$=construct_operation_node(ENDLINE,2,$1,$2);}
+               ;
 
-assignment_statement : VARIABLE '=' nested_rhs_expression  {$$ = construct_operation_node(ASSIGNMENT, 2, construct_identifier_node($1),$3);}
+assignment_statement : VARIABLE '=' nested_rhs_assignment_statement  {$$ = construct_operation_node('=', 2, construct_identifier_node($1),$3);}
                      ;
 
-declaration_statement : data_type VARIABLE '=' nested_rhs_expression    { $$ = construct_operation_node('=', 2, construct_identifier_node($2, $1), $4);}
-                      | CONST data_type VARIABLE '=' nested_rhs_expression    { $$ = construct_operation_node('=', 2, construct_identifier_node($3, $2, CONST), $5);}
+declaration_statement : data_type VARIABLE '=' nested_rhs_assignment_statement    { $$ = construct_operation_node('=', 2, construct_identifier_node($2, $1), $4);}
+                      | CONST data_type VARIABLE '=' nested_rhs_assignment_statement    { $$ = construct_operation_node('=', 2, construct_identifier_node($3, $2, CONST), $5);}
                       ;
 
-nested_rhs_expression : expression  {$$=$1;}
-                      | VARIABLE '=' nested_rhs_expression  {$$=construct_operation_node('=',2,construct_identifier_node($1),$3);}
-                      ;
+nested_rhs_assignment_statement: expression  {$$=$1;}
+                              | VARIABLE '=' nested_rhs_assignment_statement  {$$=construct_operation_node('=',2,construct_identifier_node($1),$3);}
+                              ;
+
 
 data_type : INT_TYPE          {$$=INT_TYPE}
           | FLOAT_TYPE        {$$=FLOAT_TYPE}
           | BOOL_TYPE         {$$=BOOL_TYPE}
           | STRING_TYPE       {$$=STRING_TYPE}
           ;
+
+
+function_call : FUNCTION '(' expression ')'   {}
+            ;
 
 
 /* Loops */
@@ -381,4 +387,12 @@ int main(void)
     yyparse();
     export_symbol_table();
     return 0;
+}
+
+void yyerror(const char *emsg) {
+
+  log_errors(6,line);
+  fprintf(stderr, "Syntax Error in Line %d: %s\n", line, emsg);
+  export_symbol_table();
+  exit(0);
 }

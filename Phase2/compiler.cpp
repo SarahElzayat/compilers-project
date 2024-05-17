@@ -13,6 +13,9 @@ static int label = 0;
 static int timeStep = 0;
 static int level = 0;
 
+#define ERRORLOG 1
+extern int line;
+
 static vector<symbolTable*> symbolsTable;
 
 
@@ -74,13 +77,72 @@ void export_symbol_table(){
     for (i = 0; i < symbolsTable.size(); i++)
     {
         st = symbolsTable[i];
-        fprintf(f, "%s,%s,%s,%d,%d,%s,%s\n", st->name.c_str(), get_data_type(st->type),
+        fprintf(f, "%s,\t\t%s,\t\t%s,\t\t%d,\t\t%d,\t\t%s,\t\t%s\n", st->name.c_str(), get_data_type(st->type),
         st->symbolType == CONST ? "Constant" : "Variable", st->scope, st->timestamp, st->used ? "true" : "false", st->isInitialized ? "true" : "false");
         free(st);
     }
     fclose(f);
     return;
 }
+
+
+void log_errors(int error,int l)
+{
+    FILE* f;
+    if ((f = fopen(".\\outputs\\errors.txt", "w")) == NULL)
+    {
+        yyerror("can't open file");
+    }
+
+    switch(error)
+    {
+        case 0:
+            fprintf(f,"Semantic ERROR: Type mismatch error in line: %d\n", l);
+            break;
+        case 1:
+            fprintf(f, "Semantic ERROR: Undeclared Variable in line:%d\n",l);
+            break;
+        case 2:
+            fprintf(f, "Semantic ERROR: Constant Variable in line:%d\n",l);
+            break;
+        case 3:
+            fprintf(f, "Semantic ERROR: Variable used out of scope in line:%d\n",l);
+            break;
+        case 4:
+            fprintf(f, "Semantic ERROR: Condition must be of type boolean in line:%d\n",l);
+            break;
+        case 5:
+            fprintf(f, "Semantic ERROR: Unused Variable in line:%d\n",l);
+            break;
+        case 6:
+            fprintf(f, "Syntax ERROR: Invalid Syntax in line:%d\n",l);
+        default:
+            fprintf(f, "ERROR: Unknown error in line: %d\n", l);
+            break;
+    }
+    fclose(f);
+
+}
+
+void check_unused()
+{
+    std::map<std::string, symbolTable*>::iterator it;
+    std::string str = "";
+
+    for (it = symbol[level].begin(); it != symbol[level].end(); it++) {
+        if (it->second->used == false) {
+        str += it->second->name + " ";
+        }
+    }
+
+    if (str.length() > 0)
+    {
+        log_errors(5, line);
+        yyerror(("ERROR: Unused Variable(s) " + str + "\n").c_str());
+    }    
+    return;
+}
+
 
 
 node* construct_label_node(int value){ //?????????
@@ -159,7 +221,7 @@ symbolTable* declare_identifier(node* p, bool isRHS = false) {
     }
 
     //Add identifier to symbol table
-    symbol[level][p->id.name] = new symbolTable(strdup(p->id.name), p->id.dataType, p->id.qualifier, level, timeStep++, false);
+    symbol[level][p->id.name] = new symbolTable(p->id.name, p->id.dataType, p->id.qualifier, level, timeStep++, false);
     //Add identifier to the list of symbols
     symbolsTable.push_back(symbol[level][p->id.name]);
     //Return the symbol table entry
@@ -244,7 +306,7 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
                     {
                         yyerror("ERROR: Condition must be a BOOL");
                     }
-                    printf("\tjz\tL%03d\n", l2); //if false
+                    printf("\tjz\tL%03d\n", l2= label++); //if false
 
                     execute(p->opr.op[1], l1, l2); //body
                     printf("\tjmp\tL%03d\n", l1); //continue
@@ -354,15 +416,17 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
                     remove_block_level();
                     break;
                 
-                case '=': //copilot m3rfsh da eh
-                    symbolTableEntry = declare_identifier(p->opr.op[0], true);
-                    if (symbolTableEntry == NULL)
+                case '=': 
+                    rhs = execute(p->opr.op[1]);
+                    if (p->opr.op[1]->type == OP && p->opr.op[1]->opr.oper == '=') // nested assignment
                     {
-                        return 0;
+                        printf("\tpush\t%s\n", p->opr.op[1]->opr.op[0]->id.name);
                     }
-                    execute(p->opr.op[1]);
+                    symbolTableEntry = declare_identifier(p->opr.op[0], true);
+
                     printf("\tpop\t%s\n", p->opr.op[0]->id.name);
                     symbolTableEntry->isInitialized = true;
+                    // return symbolTableEntry->type;
                     break;
 
                 case NEGATIVE:
@@ -380,17 +444,39 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
                     printf("\tNOT\n");
                     return BOOL_TYPE;
 
-                case ASSIGNMENT:
-                    execute(p->opr.op[1]);
-                    printf("\tpop\t%s\n", p->opr.op[0]->id.name);
+                // case ASSIGNMENT:
+                //     execute(p->opr.op[1]);
+                //     printf("\tpop\t%s\n", p->opr.op[0]->id.name);
+                //     break;
+
+                case BREAK:
+                    if(brk == -1)
+                    {
+                        yyerror("ERROR: Break statement not in loop");
+                    }
+                    printf("\tjmp\tL%03d\n", brk);
                     break;
+
+                case CONTINUE:
+                    if(cont == -1)
+                    {
+                        yyerror("ERROR: Continue statement not in loop");
+                    }
+                    printf("\tjmp\tL%03d\n", cont);
+                    break;
+
+                case ENDLINE:
+                    for (int i = 0; i < p->opr.nops; i++)
+                        execute(p->opr.op[i]);
+                    break;
+
 
                 //what about data types
                 default:
                 //execute the left and right operands they have to be same type
 
-                    rhs = execute(p->opr.op[0]); 
-                    lhs = execute(p->opr.op[1]);
+                    lhs = execute(p->opr.op[0]); 
+                    rhs = execute(p->opr.op[1]);
                     // if(rhs != lhs)
                     // {
                     //     char msg[1024];

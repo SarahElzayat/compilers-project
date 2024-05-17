@@ -3,6 +3,8 @@
     #include "compiler.h"
     #include "parser.tab.h"
     #include <stdbool.h>
+    void yyerror (const char *msg); 
+    int line=1;
 %}
 
 %option yylineno
@@ -78,7 +80,8 @@
                               yylval.strVal = strdup(yytext);
                               return STRING;    }
 
-[ \t\n]+  { /* ignore whitespace */ }
+[ \t\r]+  { /* ignore whitespace */ }
+\n        { line++; }
 
 "#".*                        { /*Add a Comments*/
                                printf("%s\n", yytext); 
@@ -101,9 +104,6 @@ int yywrap(void) {
     return 1;
 }
 
-void yyerror(const char *emsg) {
-  fprintf(stderr, "Error in Line %d: %s\n", yylineno, emsg);
-  exit(0);
-}
+
 
 
