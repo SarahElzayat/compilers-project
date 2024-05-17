@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdarg.h>
+
 #include <vector>
 #include <sstream>
+
 #include "compiler.h"
 #include "parser.tab.h"
 
-using std::vector;
+using namespace std;
 
 static int label = 0;
 static int timeStep = 0;
@@ -13,35 +15,80 @@ static int level = 0;
 
 static vector<symbolTable*> symbolsTable;
 
-const char* get_data_type(int type){
+
+const char* get_data_type(int type){ //return the data type as a string
 
     switch (type) 
     {
         case INTEGER:
         case INT_TYPE:
             return "int";
+
         case FLOAT:
         case FLOAT_TYPE:
             return "float";
+        
         case BOOL:
         case BOOL_TYPE:
             return "bool";
-
+        
         case STRING:
         case STRING_TYPE:
             return "string";
+        
+        case VOID_TYPE:
+            return "void";
+        
         default:
             return "";
     }
 }
 
+// SCOPES
+void add_block_level()
+{
+    //push entries to the symbol table and increase scope level
+    symbol.push_back(map<string, symbolTable*>());
+    level++;
+    return;
+}
 
-node* construct_label_node(int value){
+void remove_block_level(){
+    //pop entries from the symbol table and decrease scope level
+    symbol.pop_back();
+    level--;
+    return;
+}
+
+void export_symbol_table(){
+    FILE* f;
+    symbolTable* st;
+    int i;
+
+    if ((f = fopen(".\\outputs\\symbolTable.txt", "w")) == NULL)
+    {
+        yyerror("can't open file");
+    }
+
+    fprintf(f, "Name\t Data Type\t Symbol Type\t Scope\t Time Stamp\t Used\t Initialized\n");
+    for (i = 0; i < symbolsTable.size(); i++)
+    {
+        st = symbolsTable[i];
+        fprintf(f, "%s,%s,%s,%d,%d,%s,%s\n", st->name.c_str(), get_data_type(st->type),
+        st->symbolType == CONST ? "Constant" : "Variable", st->scope, st->timestamp, st->used ? "true" : "false", st->isInitialized ? "true" : "false");
+        free(st);
+    }
+    fclose(f);
+    return;
+}
+
+
+node* construct_label_node(int value){ //?????????
     node* p;
     size_t nodeSize;
 
     /* allocate Node */
-    nodeSize = SIZEOF_NODETYPE + sizeof(constantNode);
+    nodeSize = NODESIZE + sizeof(constantNode);
     if ((p = (node*)malloc(nodeSize)) == NULL)
     {
         yyerror("out of memory");
@@ -53,39 +100,13 @@ node* construct_label_node(int value){
     return p;
 }
 
-void export_symbol_table(){
-    FILE* f;
-    symbolTable* st;
-    int i;
 
-    if ((f = fopen("./outputs/symbolTable.txt", "w")) == NULL)
-    {
-        yyerror("cannot open symbolTable.txt");
-    }
-    else
-    {
-        fprintf(f, "Name\t Data Type\t Symbol Type\t Scope\t Time Stamp\t Used\t Initialized\n");
-        for (i = 0; i < symbolsTable.size(); i++)
-        {
-            st = symbolsTable[i];
-            fprintf(f, "%s,%s,%s,%d,%d,%s,%s\n", st->name.c_str(), get_data_type(st->type),
-            st->symbolType == CONST ? "Constant" : "Variable", st->scope, st->timestamp, st->used ? "true" : "false", st->isInitialized ? "true" : "false");
-            free(st);
-        }
-        fclose(f);
-    }
-}
 
-symbolTable* get_identifier(node* p, bool isRHS = false) {
-    if (p->type != ID) /*Not an identifier*/
+symbolTable* get_identifier(node* p, bool isRHS = false) { //get the identifier from the symbol table
+    if (p->type != ID || p->id.dataType == -1 ) /*Not an identifier or Data type not set*/
     {
         return NULL;
     }
-    else if (p->id.dataType == -1) /*Data type not set*/
-    {
-        return NULL;
-    }
-    
     for (int i = level; i >= 0; i--) //Search in the current and all parent scopes for assignment RHS
     { 
         //Check if the identifier is in the symbol table
@@ -123,63 +144,55 @@ symbolTable* declare_identifier(node* p, bool isRHS = false) {
     {
         return NULL;
     }
-    else if (p->id.dataType == -1) /*Data type not set*/
+    
+    if (p->id.dataType == -1) /*Data type not set*/
     {
         return get_identifier(p, isRHS);
     }
 
-    else if (symbol[level].count(p->id.name)) /*Identifier already declared*/
+    if (symbol[level].count(p->id.name)) /*Identifier already declared*/
     {
         char msg[1024];
         sprintf(msg, "ERROR: Identifier '%s' previously declared", p->id.name);
         yyerror(msg);
         return NULL;
     }
-    else
-    {
-        //Add identifier to symbol table
-        symbol[level][p->id.name] = new symbolTable(strdup(p->id.name), p->id.dataType, p->id.qualifier, level, timeStep++, false);
-        //Add identifier to the list of symbols
-        symbolsTable.push_back(symbol[level][p->id.name]);
-        //Return the symbol table entry
-        return symbol[level][p->id.name];
-    }
+
+    //Add identifier to symbol table
+    symbol[level][p->id.name] = new symbolTable(strdup(p->id.name), p->id.dataType, p->id.qualifier, level, timeStep++, false);
+    //Add identifier to the list of symbols
+    symbolsTable.push_back(symbol[level][p->id.name]);
+    //Return the symbol table entry
+    return symbol[level][p->id.name];
+    
 }
 
 
 
-void add_block_level()
-{
-    //push entries to the symbol table and increase scope level
-    symbol.push_back(map<string, symbolTable*>());
-    level++;
-    return;
-}
 
-
-void remove_block_level(){
-    //pop entries from the symbol table and decrease scope level
-    symbol.pop_back();
-    level--;
-    return;
-}
 
 int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
 {
     va_list ap;
-    node* lblNode;
+    vector<node*> argsVector;
+    va_start(ap, args);
+    for (int i = 0; i < args; i++)
+        argsVector.push_back(va_arg(ap, node*));
+    va_end(ap);
+    
     symbolTable* symbolTableEntry = NULL;
 
-    node*n;
-    node* switch_var;
+    node *n;
+    node *switch_var;
 
     int l1, l2, l3;
     int rhs, lhs;
     int endLabel, defaultLabel;
 
     if(!p)
-    return 0;
-    
+    {
+        return 0;
+    }
     switch (p->type)
     {
         case CONSTANT: 
@@ -190,7 +203,7 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
             return INT_TYPE;
 
             case BOOL_TYPE:
-            printf("\tpush %s\t%s\n", get_data_type(BOOL_TYPE), p->con.value.boolValue);
+            printf("\tpush %s\t%s\n", get_data_type(BOOL_TYPE), p->con.value.boolValue ? "true" : "false");
             return BOOL_TYPE;
 
             case FLOAT_TYPE:
@@ -203,27 +216,8 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
             }
             break;
 
-        // case VALUE:
-        //     switch (p->value.type)
-        //     {
-        //     case INTEGER:
-        //         printf("\tpush\t%d\n", p->value.intValue);
-        //         break;
-        //     case FLOAT:
-        //         printf("\tpush\t%f\n", p->value.floatValue);
-        //         break;
-        //     case BOOL:
-        //         printf("\tpush\t%f\n", p->value.boolValue);
-        //         break;
-        //     case STRING:
-        //         printf("\tpush\t%s\n", p->value.stringValue);
-        //         break;
-        //     }
-            
-        //     break;
         //Identifiers are pushed to the stack and written to symbols table
         case ID:
-
             symbolTableEntry = get_identifier(p);
             if (symbolTableEntry == NULL)
             {
@@ -233,24 +227,26 @@ int execute(node* p, int cont= -1, int brk = -1, int args = 0, ...)
             return symbolTableEntry->type;
 
         case OP:
-            
             switch (p->opr.oper)
             {
-                case STATEMENT_LIST:
-                    execute(p->opr.op[0]);
-                    execute(p->opr.op[1]);
-                    break;
-                
+                // case STATEMENT_LIST:
+                //     execute(p->opr.op[0]);
+                //     execute(p->opr.op[1]);
+                //     break;
 
                 /*WHILE LOOP*/
                 case WHILE:
                     add_block_level();
 
                     printf("L%03d:\n", l1 = label++); //start
-                    execute(p->opr.op[0]); //condition
-                    printf("\tjz\tL%03d\n", l2 = label++); //if false
+                    lhs = execute(p->opr.op[0]); //condition
+                    if (lhs != BOOL_TYPE) 
+                    {
+                        yyerror("ERROR: Condition must be a BOOL");
+                    }
+                    printf("\tjz\tL%03d\n", l2); //if false
 
-                    execute(p->opr.op[1]); //body
+                    execute(p->opr.op[1], l1, l2); //body
                     printf("\tjmp\tL%03d\n", l1); //continue
                     printf("L%03d:\n", l2); //end
 

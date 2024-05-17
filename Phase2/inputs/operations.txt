@@ -1,0 +1,18 @@
+
+
+# Addition
+print(x+y)
+
+# Subtraction
+print(x-y)
+
+# Multiplication
+print(x*y)
+
+# Division
+print(x/y)
+
+# Values
+print(5+2/2)
+
+#Logic

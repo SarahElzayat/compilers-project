@@ -18,20 +18,27 @@
 
 (0|[1-9][0-9]*)\.[0-9]*     { /* FLOATS */ 
                               char * x = strdup(yytext); // to ensure null-terminated string
-                              yylval.fVal = atof(yytext);
+                              yylval.fVal = atof(x);
                               return FLOAT; }
+"true"                      { /* BOOLS */ 
+                              // yylval.bVal = 1;
+                               return BOOL; }
+"false"                     {/* BOOLS */ 
+                              // yylval.bVal = 0;
+                               return BOOL; }
+                               
+"const"                     { return CONST;       }
+"int"                       { return INT_TYPE;    }
+"float"                     { return FLOAT_TYPE;  }
+"string"                    { return STRING_TYPE; }
+"bool"                      { return BOOL_TYPE;   }
+"void"                      { return VOID_TYPE;   }
 
 "print"                     { return PRINT;  }
 "return"                    { return RETURN; }
 
-"true"                      { 
-                              yylval.bVal = 1;
-                               return BOOL; }
-"false"                     { 
-                              yylval.bVal = 0;
-                               return BOOL; }
 
-[-()+*/{}<>=.:;]             { return yytext[0]; }
+[-()<>=+*/{}.:;]             { return yytext[0]; }
 
 ">="                        { return GREATER_EQUAL; }
 "<="                        { return LESS_EQUAL;    }
@@ -42,11 +49,7 @@
 "or"                        { return OR;            }
 "not"                       { return NOT;           }
 
-"const"                     { return CONST;       }
-"int"                       { return INT_TYPE;    }
-"float"                     { return FLOAT_TYPE;  }
-"string"                    { return STRING_TYPE; }
-"bool"                      { return BOOL_TYPE;   }
+
  
 
 "for"                       { return FOR;      }
@@ -54,11 +57,9 @@
 "do"                        { return DO;       }
 "while"                     { return WHILE;    }
 
-"break"                     { return BREAK;    }
-"continue"                  { return CONTINUE; }
 
-"else"                      { return ELSE;     }
 "if"                        { return IF;       }
+"else"                      { return ELSE;     }
 
 "switch"                    { return SWITCH;   }
 "case"                      { return CASE;     }
@@ -66,6 +67,8 @@
 "def"                       { return FUNCTION; }   
 "default"                   { return DEFAULT;  }
 
+"break"                     { return BREAK;    }
+"continue"                  { return CONTINUE; }
 
 [a-zA-Z_][a-zA-Z0-9_]*      { 
                               yylval.varName = strdup(yytext);
@@ -77,9 +80,17 @@
 
 [ \t\n]+  { /* ignore whitespace */ }
 
+"#".*                        { /*Add a Comments*/
+                               printf("%s\n", yytext); 
+                                if (yytext[yyleng - 1] == '\n') 
+                                {
+                                    yylineno--;   
+                                 }
+                                }
+
 .   { 
     char msg[1024];
-    sprintf(msg, "Unknown character: %s", yytext);
+    sprintf(msg, "Syntax ERROR: Unknown character: %s", yytext);
     yyerror(msg);
   }
 
@@ -90,8 +101,8 @@ int yywrap(void) {
     return 1;
 }
 
-void yyerror(const char *s) {
-  fprintf(stderr, "Line %d: %s\n", yylineno, s);
+void yyerror(const char *emsg) {
+  fprintf(stderr, "Error in Line %d: %s\n", yylineno, emsg);
   exit(0);
 }
 

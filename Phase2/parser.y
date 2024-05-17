@@ -1,5 +1,4 @@
-%{  
-
+%{
     //INCLUDES
     #include <stdio.h>
     #include "compiler.h"
@@ -10,7 +9,6 @@
     node *construct_operation_node(int oper, int nops, ...);
     node *construct_identifier_node(char*, int = -1, int = -1);
     node *construct_constant_node(int, int, ...);
-    node *construct_value_node(int, int, float, bool, char*, bool, char* = NULL);
     //----------------------------------------------
 
     void free_node(node *p);
@@ -33,11 +31,8 @@
     bool bVal;             /*   boolean       */
     char *strVal;          /*   string        */
 
-    char *conName;         /*   constant      */
     char *varName;         /*   variable      */
-
     char *sIdx;            /*   symbol table  */
-
     node *n;               /*   node          */
 }
 
@@ -71,14 +66,14 @@ Keyword     Description
 %token IF                                                                /* Keywords for if statement */
 %token SWITCH CASE DEFAULT                                               /* Keywords for switch statement */
 %token FOR WHILE DO BREAK CONTINUE                                       /* Keywords for loops */
-%token CONST INT_TYPE FLOAT_TYPE BOOL_TYPE STRING_TYPE              /* Keywords for data types */
+%token CONST INT_TYPE FLOAT_TYPE BOOL_TYPE STRING_TYPE  VOID_TYPE            /* Keywords for data types */
 %token FUNCTION                                                          /* Keyword for function declaration */
 %token PRINT                                                             /* Keyword for print */
 
-
-%nonassoc RETURN
 %nonassoc IFX                                                       /* Keyword for If statement precedance handling*/
 %nonassoc ELSE                                                      /* Keyword for else statement */
+
+%nonassoc RETURN
 %nonassoc ENDLINE 
 
 
@@ -92,12 +87,14 @@ Keyword     Description
 %left '+' '-'
 %left '*' '/'
 %right NOT
+
 %nonassoc NEGATIVE
 
 /* Non Terminal Types */
-%type <n> program statement_list statement assignment_statement 
-%type <n> function_call declaration_statement 
+%type <n> program statement_list statement  
+%type <n> function_call assignment_statement declaration_statement nested_rhs_expression
 %type <n> for_statement while_statement do_while_statement if_statement switch_statement cases expression default_statement
+
 %type <iVal> data_type
 
 /* End of Tokens */
@@ -106,18 +103,27 @@ Keyword     Description
 /* Part 4 : Production Rules */
 %%
 
-program : statement_list   {execute($1);free_node($1); std::cout<<"program "<<std::endl;exit(0);}
-        ;
+/* program : statement_list   {execute($1);free_node($1); std::cout<<"program "<<std::endl;exit(0);}
+        ; */
 
-statement_list : statement                    {$$=$1;}
+program : statement_list  {$$=$1;}
+        ;
+/* statement_list : statement                    {$$=$1;}
                | statement_list statement     {$$=construct_operation_node(STATEMENT_LIST,2,$1,$2);}
+               ; */
+
+statement_list : statement_list statement     { execute($2); free_node($2); }
+                | {$$ = NULL;}
                ;
 
-statement : assignment_statement              {std::cout<<"assignment_statement "<<std::endl;   $$=$1;}
-          | declaration_statement             {std::cout<<"declaration_statement "<<std::endl;  $$=$1;}
+statement :ENDLINE                            {std::cout<<"ENDLINE "<<std::endl;} 
           | expression                        {std::cout<<"expression "<<std::endl; $$=$1;}
+          
+          | PRINT expression                  {std::cout<<"PRINT EXP "<<std::endl;  $$=construct_operation_node(PRINT,1,$2);}
+          
+          | assignment_statement              {std::cout<<"assignment_statement "<<std::endl;   $$=$1;}
+          | declaration_statement             {std::cout<<"declaration_statement "<<std::endl;  $$=$1;}
 
-          | PRINT '(' expression ')'          {std::cout<<"PRINT EXP "<<std::endl;  $$=construct_operation_node(PRINT,1,$3);}
 
 
           | for_statement                     {std::cout<<"for_statement "<<std::endl;}
@@ -132,25 +138,24 @@ statement : assignment_statement              {std::cout<<"assignment_statement 
           | RETURN ENDLINE                    {std::cout<<"RETURN "<<std::endl;}
           | RETURN expression ENDLINE         {std::cout<<"RETURN EXP "<<std::endl;}
 
-          | BREAK                             {std::cout<<"BREAK "<<std::endl;construct_operation_node(BREAK,0)}
-          | CONTINUE                          {std::cout<<"CONTINUE "<<std::endl;}
+          | BREAK                             {std::cout<<"BREAK "<<std::endl; construct_operation_node(BREAK,1, NULL)}
+          | CONTINUE                          {std::cout<<"CONTINUE "<<std::endl; construct_operation_node(CONTINUE,1, NULL)}
           ;
-
-
-assignment_statement : VARIABLE '=' expression  {$$ = construct_operation_node(ASSIGNMENT, 2, construct_identifier_node($1),$3);}
-                     ;
-
-              
 
 function_call : FUNCTION '(' expression ')'   {}
             ;
 
 
+assignment_statement : VARIABLE '=' nested_rhs_expression  {$$ = construct_operation_node(ASSIGNMENT, 2, construct_identifier_node($1),$3);}
+                     ;
 
-declaration_statement : data_type VARIABLE '=' expression    { $$ = construct_operation_node('=', 2, construct_identifier_node($2, $1), $4);}
-                      | CONST data_type VARIABLE '=' expression    { $$ = construct_operation_node('=', 2, construct_identifier_node($3, $2, CONST), $5);}
+declaration_statement : data_type VARIABLE '=' nested_rhs_expression    { $$ = construct_operation_node('=', 2, construct_identifier_node($2, $1), $4);}
+                      | CONST data_type VARIABLE '=' nested_rhs_expression    { $$ = construct_operation_node('=', 2, construct_identifier_node($3, $2, CONST), $5);}
                       ;
 
+nested_rhs_expression : expression  {$$=$1;}
+                      | VARIABLE '=' nested_rhs_expression  {$$=construct_operation_node('=',2,construct_identifier_node($1),$3);}
+                      ;
 
 data_type : INT_TYPE          {$$=INT_TYPE}
           | FLOAT_TYPE        {$$=FLOAT_TYPE}
@@ -196,7 +201,8 @@ expression :
            | BOOL                      {$$ =  construct_constant_node( BOOL, BOOL_TYPE,$1);}
            | VARIABLE                  {$$ = construct_identifier_node($1);}
            /*Negative*/
-            | '-' expression %prec NEGATIVE        {$$=construct_operation_node(NEGATIVE,1,$2);}  
+            /* | '-' expression %prec NEGATIVE        {$$=construct_operation_node(NEGATIVE,1,$2);}   */
+            | NOT expression                       {$$=construct_operation_node(NOT,2,$2);}
            /*Mathimatical*/
            | expression '+' expression            {$$=construct_operation_node('+',2,$1,$3);}
            | expression '-' expression            {$$=construct_operation_node('-',2,$1,$3);}
@@ -205,7 +211,7 @@ expression :
            | expression '<' expression          {$$=construct_operation_node('<',2,$1,$3);}
            | expression '>' expression         {$$=construct_operation_node('>',2,$1,$3);}
            /*Logical*/
-           | NOT expression                       {$$=construct_operation_node(NOT,2,$2);}
+           
            | expression AND expression        {$$=construct_operation_node(AND,2,$1,$3);}
            | expression OR expression         {$$=construct_operation_node(OR,2,$1,$3);}
            | expression GREATER_EQUAL expression    {$$=construct_operation_node(GREATER_EQUAL,2,$1,$3);}
@@ -226,7 +232,7 @@ node *construct_constant_node(int type, int dataType, ...) {
      size_t nodeSize;
 
      /* allocate Node */
-     nodeSize = SIZEOF_NODETYPE + sizeof(constantNode);
+     nodeSize = NODESIZE + sizeof(constantNode);
      if ((p = (node*)malloc(nodeSize)) == NULL)
      {
          yyerror("out of memory");
@@ -318,7 +324,7 @@ node *construct_operation_node(int oper, int nOpers, ...) {
   size_t nodeSize;
   int i = 0;
   
-  nodeSize = SIZEOF_NODETYPE + sizeof(opNode) +
+  nodeSize = NODESIZE + sizeof(opNode) +
     (nOpers - 1) * sizeof(node*);
   if ((p = (node*)malloc(nodeSize)) == NULL)
   {
@@ -342,7 +348,7 @@ node *construct_operation_node(int oper, int nOpers, ...) {
 node *construct_identifier_node(char* i, int dataType, int qualifier) {
   node *p;
   size_t nodeSize;
-  nodeSize = SIZEOF_NODETYPE + sizeof(idNode);
+  nodeSize = NODESIZE + sizeof(idNode);
   if ((p = (node*)malloc(nodeSize)) == NULL)
     yyerror("out of memory");
 

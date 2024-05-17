@@ -58,20 +58,21 @@
      FLOAT_TYPE = 274,
      BOOL_TYPE = 275,
      STRING_TYPE = 276,
-     FUNCTION = 277,
-     PRINT = 278,
-     RETURN = 279,
+     VOID_TYPE = 277,
+     FUNCTION = 278,
+     PRINT = 279,
      IFX = 280,
      ELSE = 281,
-     ENDLINE = 282,
-     OR = 283,
-     AND = 284,
-     NOTEQUAL = 285,
-     EQUAL = 286,
-     LESS_EQUAL = 287,
-     GREATER_EQUAL = 288,
-     NOT = 289,
-     NEGATIVE = 290
+     RETURN = 282,
+     ENDLINE = 283,
+     OR = 284,
+     AND = 285,
+     NOTEQUAL = 286,
+     EQUAL = 287,
+     LESS_EQUAL = 288,
+     GREATER_EQUAL = 289,
+     NOT = 290,
+     NEGATIVE = 291
    };
 #endif
 
@@ -82,24 +83,21 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 30 "parser.y"
+#line 28 "parser.y"
 
     int iVal;              /*   integer       */
     float fVal;            /*   float         */
     bool bVal;             /*   boolean       */
     char *strVal;          /*   string        */
 
-    char *conName;         /*   constant      */
     char *varName;         /*   variable      */
-
     char *sIdx;            /*   symbol table  */
-
     node *n;               /*   node          */
 
 
 
 /* Line 1676 of yacc.c  */
-#line 103 "parser.tab.h"
+#line 101 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
