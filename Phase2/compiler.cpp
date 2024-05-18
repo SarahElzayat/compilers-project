@@ -67,8 +67,8 @@ const char* get_data_type(int type) {
 SymbolTable* get_function_variable(Node*p)
 {
     printf("Function name: %s\n", p->id.name);
-    printf("fagf");
-    printf("Lttttt %s\n", symbol[1][p->id.name]);
+    std::cout<<symbol.size()<<std::endl;
+    printf("Lttttt %s\n", symbol[0][p->id.name]->name);
     
     for (int i = level; i >= 0; i--) 
     { 
@@ -514,11 +514,11 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
 
             // }
             //symbolTableEntry = get_function_variable(p->opr.op[0]); 
-            // open_file();
-            // symbolTableEntry = get_function_variable(p->opr.op[0]);
+             open_file();
+            //symbolTableEntry = get_function_variable(p->opr.op[0]);
             printf("\tcall\t%s \n",p->opr.op[0]->id.name);
             fprintf(assemblyOutFile, "\tcall\t%s\n",p->opr.op[0]->id.name);
-            // return symbolTableEntry->type;
+            return 274;
             break;
 
         case COMMA:

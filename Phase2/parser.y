@@ -146,7 +146,7 @@ function_call : VARIABLE '(' comma_expressions ')' ';'   {$$=construct_operation
 return_statement: RETURN statement { $$ = construct_operation_node(RETURN, 1, $2); }
                 ;
                 
-comma_expressions: expression ',' comma_expressions { $$ = construct_operation_node(COMMA, 2, $1, $3); }
+comma_expressions: comma_expressions','expression { $$ = construct_operation_node(COMMA, 2, $1, $3); }
                 | expression                        { $$ = $1; }
                 |                                   { $$ = NULL; }
                 ;
@@ -207,7 +207,7 @@ for_mid_stmt:
   | expression { $$ = $1; }
   ;
 
-assignment_statement: VARIABLE '=' function_call %prec FUNC { $$ = construct_operation_node('=', 2, construct_identifier_node($1), $3); }
+assignment_statement: VARIABLE '=' function_call %prec FUNC {std::cout<<"function_call assignement matched\n"; $$ = construct_operation_node('=', 2, construct_identifier_node($1), $3); }
                       | VARIABLE '=' rhs_nested_expression { $$ = construct_operation_node('=', 2, construct_identifier_node($1), $3); }
   ;
 

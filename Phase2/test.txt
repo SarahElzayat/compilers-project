@@ -1,12 +1,9 @@
-int a = 3;
-int b = 3;
-
-def void test (int x,int y)
-{
-    print("ana gowa test");
-    return;
+def int test(int x){
+    int y;
+    return 6;
 }
 
-test(a,b);
+int x=8;
+int y=4;
 
-int shokran =2;
+y = test(x);;

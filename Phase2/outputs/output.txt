@@ -1,16 +1,13 @@
-	push int	3
-	pop int	a
-	push int	3
-	pop int	b
 	proc	test
 	pop int	x
 	pop int	y
-	push string	"ana gowa test"
-	print
 	ret	
+	push int	6
 	endproc	
-	push	a
-	push	b
+	push int	8
+	pop int	x
+	push int	4
+	pop int	y
+	push	x
 	call	test
-	push int	2
-	pop int	shokran
+	pop int	y
