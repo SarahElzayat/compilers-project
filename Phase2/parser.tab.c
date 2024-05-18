@@ -1703,14 +1703,14 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 124 "parser.y"
-    {std::cout<<"function_call "<<std::endl;;}
+    {/*std::cout<<"function_call "<<std::endl;*/ (yyval.nodePtr) = (yyvsp[(1) - (1)].nodePtr); ;}
     break;
 
   case 14:
 
 /* Line 1455 of yacc.c  */
 #line 125 "parser.y"
-    {std::cout<<"function_declaration "<<std::endl;;}
+    {/*std::cout<<"function_declaration "<<std::endl;*/ (yyval.nodePtr) = (yyvsp[(1) - (1)].nodePtr);;}
     break;
 
   case 15:

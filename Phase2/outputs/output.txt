@@ -1,24 +1,16 @@
 	push int	3
 	pop int	a
-	pop a	
-L001:
-	push	a
 	push int	3
-	compEQ	
-	jz	L002
-	push int	4
-	pop int	a
-	jmp	L11111
-L002:
+	pop int	b
+	proc	test
+	pop int	x
+	pop int	y
+	push string	"ana gowa test"
+	print
+	ret	
+	endproc	
 	push	a
-	push int	4
-	compEQ	
-	jz	L999
-	push int	5
-	pop int	a
-	jmp	L11111
-L999:
-	push int	6
-	pop int	a
-	jmp	L11111
-L11111:
+	push	b
+	call	test
+	push int	2
+	pop int	shokran

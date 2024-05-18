@@ -121,9 +121,9 @@ statement: ';'                                 { $$ = construct_operation_node('
           | do_while_statement                 { /*std::cout<<"do_while_statement "<<std::endl;*/ $$ = $1; }
           | for_statement                      { /*std::cout<<"for_statement "<<std::endl;*/ $$ = $1; }
           
-          | function_call                      {std::cout<<"function_call "<<std::endl;}
-          | function_declaration               {std::cout<<"function_declaration "<<std::endl;}
-          | return_statement                    { /*std::cout<<"return_statement "<<std::endl;*/ $$ = $1; }
+          | function_call                      {/*std::cout<<"function_call "<<std::endl;*/ $$ = $1; }
+          | function_declaration               {/*std::cout<<"function_declaration "<<std::endl;*/ $$ = $1;}
+          | return_statement                   { /*std::cout<<"return_statement "<<std::endl;*/ $$ = $1; }
 
           | if_statement                       { /*std::cout<<"if_statement "<<std::endl;*/ $$ = $1; }
           | switch_statement                   { /*std::cout<<"switch_statement "<<std::endl;*/ $$ = $1; }

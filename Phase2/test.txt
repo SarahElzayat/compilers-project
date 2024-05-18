@@ -1,14 +1,12 @@
 int a = 3;
+int b = 3;
 
-switch(a)
+def void test (int x,int y)
 {
-    case 3 :
-    a=4;
-    break;
-    case 4:
-    a=5;
-    break;
-    default:
-    a=6;
-    
+    print("ana gowa test");
+    return;
 }
+
+test(a,b);
+
+int shokran =2;
