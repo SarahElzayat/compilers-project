@@ -6,4 +6,4 @@ def int test(int x){
 int x=8;
 int y=4;
 
-y = test(x);;
+y= test(x);;

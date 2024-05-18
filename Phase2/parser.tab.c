@@ -184,12 +184,12 @@ static const short yyrline[] = { 0,
    105,   108,   109,   113,   114,   115,   117,   118,   120,   121,
    122,   124,   125,   126,   128,   129,   130,   131,   132,   136,
    138,   139,   140,   143,   146,   149,   150,   151,   154,   158,
-   161,   165,   166,   183,   193,   194,   197,   198,   203,   205,
-   206,   207,   210,   211,   214,   216,   219,   220,   221,   224,
-   225,   226,   227,   228,   231,   233,   236,   237,   238,   241,
-   242,   246,   247,   248,   249,   250,   251,   252,   253,   254,
-   255,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-   265,   266
+   161,   165,   166,   170,   174,   175,   178,   179,   184,   186,
+   187,   188,   191,   192,   195,   197,   200,   201,   202,   205,
+   206,   207,   208,   209,   212,   214,   217,   218,   219,   222,
+   223,   227,   228,   229,   230,   231,   232,   233,   234,   235,
+   236,   237,   238,   239,   240,   241,   242,   243,   244,   245,
+   246,   247
 };
 #endif
 
@@ -1083,199 +1083,199 @@ case 33:
 { yyval.nodePtr = construct_operation_node(IF, 3, yyvsp[-8].nodePtr, yyvsp[-5].nodePtr, yyvsp[-1].nodePtr); ;
     break;}
 case 34:
-#line 184 "parser.y"
+#line 171 "parser.y"
 { yyval.nodePtr = construct_operation_node(DEFAULT, 1, yyvsp[0].nodePtr); ;
     break;}
 case 35:
-#line 193 "parser.y"
+#line 174 "parser.y"
 {yyval.nodePtr=construct_operation_node(SWITCH,2,construct_identifier_node(yyvsp[-4].sIndex),yyvsp[-1].nodePtr);;
     break;}
 case 36:
-#line 194 "parser.y"
+#line 175 "parser.y"
 {yyval.nodePtr=construct_operation_node(SWITCH,3,construct_identifier_node(yyvsp[-5].sIndex),yyvsp[-2].nodePtr,yyvsp[-1].nodePtr);;
     break;}
 case 37:
-#line 197 "parser.y"
+#line 178 "parser.y"
 {yyval.nodePtr=construct_operation_node(CASE,4,construct_constant_node(INTEGER,INT_TYPE,yyvsp[-5].intValue),yyvsp[-3].nodePtr,construct_operation_node(BREAK,0),yyvsp[0].nodePtr);;
     break;}
 case 38:
-#line 198 "parser.y"
+#line 179 "parser.y"
 {yyval.nodePtr=construct_operation_node(CASE,3,construct_constant_node(INTEGER,INT_TYPE,yyvsp[-4].intValue),yyvsp[-2].nodePtr,construct_operation_node(BREAK,0));;
     break;}
 case 39:
-#line 204 "parser.y"
+#line 185 "parser.y"
 { yyval.nodePtr = construct_operation_node(';', 2, NULL, NULL); ;
     break;}
 case 40:
-#line 205 "parser.y"
+#line 186 "parser.y"
 { yyval.nodePtr = construct_operation_node(PRINT, 1, yyvsp[0].nodePtr); ;
     break;}
 case 41:
-#line 206 "parser.y"
+#line 187 "parser.y"
 { yyval.nodePtr = yyvsp[0].nodePtr; ;
     break;}
 case 42:
-#line 207 "parser.y"
+#line 188 "parser.y"
 { yyval.nodePtr = yyvsp[0].nodePtr; ;
     break;}
 case 43:
-#line 210 "parser.y"
+#line 191 "parser.y"
 {std::cout<<"function_call assignement matched\n"; yyval.nodePtr = construct_operation_node('=', 2, construct_identifier_node(yyvsp[-2].sIndex), yyvsp[0].nodePtr); ;
     break;}
 case 44:
-#line 211 "parser.y"
+#line 192 "parser.y"
 { yyval.nodePtr = construct_operation_node('=', 2, construct_identifier_node(yyvsp[-2].sIndex), yyvsp[0].nodePtr); ;
     break;}
 case 45:
-#line 215 "parser.y"
+#line 196 "parser.y"
 { yyval.nodePtr = construct_operation_node(';', 2, NULL, NULL); ;
     break;}
 case 46:
-#line 216 "parser.y"
+#line 197 "parser.y"
 { yyval.nodePtr = yyvsp[0].nodePtr; ;
     break;}
 case 47:
-#line 219 "parser.y"
+#line 200 "parser.y"
 { yyval.nodePtr = construct_operation_node(DECLARE_ONLY, 1, construct_identifier_node(yyvsp[0].sIndex, yyvsp[-1].intValue)); ;
     break;}
 case 48:
-#line 220 "parser.y"
+#line 201 "parser.y"
 { yyval.nodePtr = construct_operation_node('=', 2, construct_identifier_node(yyvsp[-2].sIndex, yyvsp[-3].intValue), yyvsp[0].nodePtr); ;
     break;}
 case 49:
-#line 221 "parser.y"
+#line 202 "parser.y"
 { yyval.nodePtr = construct_operation_node('=', 2, construct_identifier_node(yyvsp[-2].sIndex, yyvsp[-3].intValue, CONST), yyvsp[0].nodePtr); ;
     break;}
 case 50:
-#line 224 "parser.y"
+#line 205 "parser.y"
 { yyval.intValue = INT_TYPE ;
     break;}
 case 51:
-#line 225 "parser.y"
+#line 206 "parser.y"
 { yyval.intValue = FLOAT_TYPE ;
     break;}
 case 52:
-#line 226 "parser.y"
+#line 207 "parser.y"
 { yyval.intValue = BOOL_TYPE ;
     break;}
 case 53:
-#line 227 "parser.y"
+#line 208 "parser.y"
 { yyval.intValue = STRING_TYPE ;
     break;}
 case 54:
-#line 228 "parser.y"
+#line 209 "parser.y"
 { yyval.intValue = VOID_TYPE ;
     break;}
 case 55:
-#line 232 "parser.y"
+#line 213 "parser.y"
 { yyval.nodePtr = construct_operation_node(';', 2, NULL, NULL); ;
     break;}
 case 56:
-#line 233 "parser.y"
+#line 214 "parser.y"
 { yyval.nodePtr = yyvsp[0].nodePtr; ;
     break;}
 case 57:
-#line 236 "parser.y"
+#line 217 "parser.y"
 { yyval.nodePtr = yyvsp[0].nodePtr; ;
     break;}
 case 58:
-#line 237 "parser.y"
+#line 218 "parser.y"
 { yyval.nodePtr = construct_operation_node('=', 2, construct_identifier_node(yyvsp[-2].sIndex), yyvsp[0].nodePtr); ;
     break;}
 case 59:
-#line 238 "parser.y"
+#line 219 "parser.y"
 { yyval.nodePtr = construct_operation_node('=', 2, construct_identifier_node(yyvsp[-3].sIndex), yyvsp[-1].nodePtr); ;
     break;}
 case 60:
-#line 241 "parser.y"
+#line 222 "parser.y"
 { yyval.nodePtr = yyvsp[0].nodePtr; ;
     break;}
 case 61:
-#line 242 "parser.y"
+#line 223 "parser.y"
 { yyval.nodePtr = construct_operation_node(';', 2, yyvsp[-1].nodePtr, yyvsp[0].nodePtr); ;
     break;}
 case 62:
-#line 246 "parser.y"
+#line 227 "parser.y"
 { yyval.nodePtr = construct_constant_node(INTEGER, INT_TYPE, yyvsp[0].intValue); ;
     break;}
 case 63:
-#line 247 "parser.y"
+#line 228 "parser.y"
 { yyval.nodePtr = construct_constant_node(FLOAT, FLOAT_TYPE, yyvsp[0].floatValue); ;
     break;}
 case 64:
-#line 248 "parser.y"
+#line 229 "parser.y"
 { yyval.nodePtr = construct_constant_node(STRING, STRING_TYPE, yyvsp[0].stringValue); ;
     break;}
 case 65:
-#line 249 "parser.y"
+#line 230 "parser.y"
 { yyval.nodePtr = construct_identifier_node(yyvsp[0].sIndex); ;
     break;}
 case 66:
-#line 250 "parser.y"
+#line 231 "parser.y"
 { yyval.nodePtr = construct_constant_node (BOOL, BOOL_TYPE, yyvsp[0].boolValue); ;
     break;}
 case 67:
-#line 251 "parser.y"
+#line 232 "parser.y"
 { yyval.nodePtr = construct_operation_node(NEGATIVE, 1, yyvsp[0].nodePtr); ;
     break;}
 case 68:
-#line 252 "parser.y"
+#line 233 "parser.y"
 { yyval.nodePtr = construct_operation_node(NOT, 1, yyvsp[0].nodePtr); ;
     break;}
 case 69:
-#line 253 "parser.y"
+#line 234 "parser.y"
 { yyval.nodePtr = construct_operation_node('+', 2, yyvsp[-2].nodePtr, yyvsp[0].nodePtr); ;
     break;}
 case 70:
-#line 254 "parser.y"
+#line 235 "parser.y"
 { yyval.nodePtr = construct_operation_node('-', 2, yyvsp[-2].nodePtr, yyvsp[0].nodePtr); ;
     break;}
 case 71:
-#line 255 "parser.y"
+#line 236 "parser.y"
 { yyval.nodePtr = construct_operation_node('*', 2, yyvsp[-2].nodePtr, yyvsp[0].nodePtr); ;
     break;}
 case 72:
-#line 256 "parser.y"
+#line 237 "parser.y"
 { yyval.nodePtr = construct_operation_node('/', 2, yyvsp[-2].nodePtr, yyvsp[0].nodePtr); ;
     break;}
 case 73:
-#line 257 "parser.y"
+#line 238 "parser.y"
 { yyval.nodePtr = construct_operation_node('%', 2, yyvsp[-2].nodePtr, yyvsp[0].nodePtr); ;
     break;}
 case 74:
-#line 258 "parser.y"
+#line 239 "parser.y"
 { yyval.nodePtr = construct_operation_node('<', 2, yyvsp[-2].nodePtr, yyvsp[0].nodePtr); ;
     break;}
 case 75:
-#line 259 "parser.y"
+#line 240 "parser.y"
 { yyval.nodePtr = construct_operation_node('>', 2, yyvsp[-2].nodePtr, yyvsp[0].nodePtr); ;
     break;}
 case 76:
-#line 260 "parser.y"
+#line 241 "parser.y"
 { yyval.nodePtr = construct_operation_node(GREATER_EQUAL, 2, yyvsp[-2].nodePtr, yyvsp[0].nodePtr); ;
     break;}
 case 77:
-#line 261 "parser.y"
+#line 242 "parser.y"
 { yyval.nodePtr = construct_operation_node(LESS_EQUAL, 2, yyvsp[-2].nodePtr, yyvsp[0].nodePtr); ;
     break;}
 case 78:
-#line 262 "parser.y"
+#line 243 "parser.y"
 { yyval.nodePtr = construct_operation_node(NOT_EQUAL, 2, yyvsp[-2].nodePtr, yyvsp[0].nodePtr); ;
     break;}
 case 79:
-#line 263 "parser.y"
+#line 244 "parser.y"
 { yyval.nodePtr = construct_operation_node(EQUAL, 2, yyvsp[-2].nodePtr, yyvsp[0].nodePtr); ;
     break;}
 case 80:
-#line 264 "parser.y"
+#line 245 "parser.y"
 { yyval.nodePtr = construct_operation_node(AND, 2, yyvsp[-2].nodePtr, yyvsp[0].nodePtr); ;
     break;}
 case 81:
-#line 265 "parser.y"
+#line 246 "parser.y"
 { yyval.nodePtr = construct_operation_node(OR, 2, yyvsp[-2].nodePtr, yyvsp[0].nodePtr); ;
     break;}
 case 82:
-#line 266 "parser.y"
+#line 247 "parser.y"
 { yyval.nodePtr = yyvsp[-1].nodePtr; ;
     break;}
 }
@@ -1500,7 +1500,7 @@ yyerrhandle:
     }
   return 1;
 }
-#line 269 "parser.y"
+#line 250 "parser.y"
 
 
 Node *construct_constant_node(int type, int dataType, ...) {
