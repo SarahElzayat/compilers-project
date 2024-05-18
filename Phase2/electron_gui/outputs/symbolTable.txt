@@ -1,7 +1,6 @@
 Name,	DataType,	Qualifier,	TimeStep,	Scope,	Initialized,	Used,	 Function
-a,		int, 		Variable, 		0, 		0, 		True, 		True, 		False 
-b,		int, 		Variable, 		1, 		0, 		True, 		True, 		False 
-test,		void, 		Variable, 		2, 		1, 		False, 		False, 		True 
-x,		int, 		Variable, 		3, 		1, 		False, 		False, 		False 
-y,		int, 		Variable, 		4, 		1, 		False, 		False, 		False 
-shokran,		int, 		Variable, 		5, 		0, 		True, 		False, 		False 
+test,		int, 		Variable, 		0, 		1, 		False, 		False, 		True 
+x,		int, 		Variable, 		1, 		1, 		False, 		False, 		False 
+y,		int, 		Variable, 		2, 		1, 		False, 		False, 		False 
+x,		int, 		Variable, 		3, 		0, 		True, 		True, 		False 
+y,		int, 		Variable, 		4, 		0, 		True, 		True, 		False 

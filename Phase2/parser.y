@@ -131,7 +131,7 @@ statement: ';'                                 { $$ = construct_operation_node('
           | BREAK ';'                          { /*std::cout<<"BREAK "<<std::endl;*/ $$ = construct_operation_node(BREAK, 1, NULL); }
           | CONTINUE ';'                       { /*std::cout<<"CONTINUE "<<std::endl;*/$$ = construct_operation_node(CONTINUE, 1, NULL); } 
           ;
-
+                    
 /* Functions */
 function_declaration: FUNCTION declaration_statement'('parameter_list')' '{'statement  return_statement'}'  {$$=construct_operation_node(FUNCTION,4,$2,$4,$7,$8);}
 
@@ -166,29 +166,10 @@ if_statement: IF '(' expression ')' '{' statement_list '}' %prec IFX { $$ = cons
             | IF '(' expression ')' '{' statement_list '}' ELSE '{' statement_list '}' { $$ = construct_operation_node(IF, 3, $3, $6, $10); }
             ;
 
-//switch_statement: SWITCH '(' expression ')' '{' switch_body '}' { $$ = construct_operation_node(SWITCH, 2, $3, $6); }
-     //           ;
-
-//switch_body:
-  //cases { /*$$ = construct_operation_node(SWITCH_BODY, 1, $1);*/ }
-  //| cases default_statement { /*$$ = construct_operation_node(SWITCH_BODY, 2, $1, $2);*/ }
-  //;
-
-//cases:
-  //CASE INTEGER ':' case_statement cases { $$ = construct_operation_node(CASE, 3, construct_constant_node(INTEGER, INT_TYPE, $2), $4, $5); }
-  //| CASE BOOL ':' case_statement cases { $$ = construct_operation_node(CASE, 3, construct_constant_node(BOOL, BOOL_TYPE, $2), $4, $5); }
-  //| { $$ = construct_operation_node(';', 2, NULL, NULL); }
-  //;
 
 default_statement:
   DEFAULT ':' statement { $$ = construct_operation_node(DEFAULT, 1, $3); }
   ;
-
-//case_statement: 
-  //statement_list { $$ = $1; }
-  //| { $$ = construct_operation_node(';', 2, NULL, NULL); }
-  //;
-
 
 switch_statement :  SWITCH '(' VARIABLE ')' '{' cases '}'                           {$$=construct_operation_node(SWITCH,2,construct_identifier_node($3),$6);}
                  |  SWITCH '(' VARIABLE ')' '{' cases  default_statement'}'          {$$=construct_operation_node(SWITCH,3,construct_identifier_node($3),$6,$7);}
