@@ -1,0 +1,36 @@
+#Unused Variables
+int x = 3;
+
+#Assigning value to a constant variable 
+const int no_change = 100;
+no_change = 2;
+
+#Usage of variable without initializing it
+int a;
+print(a);
+
+#Usage of variable without declaration
+sarah = "tuhfa";
+
+#Variable Re-declaration
+bool f = true;
+bool f = false;
+
+#Conditions must be of a BOOL Value
+if(x)
+{
+    print("test");
+}
+
+#Type mismatch in assignment
+int x= 3;
+bool f = false;
+x = f
+
+#Break with no loop
+int x = 4;
+break;
+
+#Continue with no loop
+int x = 4;
+continue;

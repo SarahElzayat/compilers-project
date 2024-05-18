@@ -1,0 +1,14 @@
+
+int f = 2;
+
+
+
+# If Else
+if(f == 1)
+{
+    print("f = 1");
+}
+else
+{
+    print("f != 1");
+}

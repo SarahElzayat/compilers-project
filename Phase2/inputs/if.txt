@@ -1,0 +1,8 @@
+
+int f = 2;
+
+# If Only
+if(f == 1)
+{
+    print(" f = 1");
+}

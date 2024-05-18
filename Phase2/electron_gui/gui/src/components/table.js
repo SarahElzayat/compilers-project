@@ -28,6 +28,7 @@ const DataTable = ({ data, containerStyle, headerStyle, rowStyle }) => {
             <th style={{ ...headerStyle }}>Scope</th>
             <th style={{ ...headerStyle }}>Initialized</th>
             <th style={{ ...headerStyle }}>Used</th>
+            <th style={{ ...headerStyle }}>Function</th>
           </tr>
         </thead>
         <tbody>
@@ -46,6 +47,7 @@ const DataTable = ({ data, containerStyle, headerStyle, rowStyle }) => {
               <td>{item.Scope}</td>
               <td>{item.Initialized}</td>
               <td>{item.Used}</td>
+              <td>{item.Function}</td>
             </tr>
           ))}
         </tbody>

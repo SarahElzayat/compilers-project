@@ -1,25 +1,2 @@
 	push int	5
-	push int	5
-	push int	5
-	push int	5
-	push int	5
-	push int	5
-	push int	5
-	push int	5
 	push	x
-	push	y
-	add
-	push	x
-	push	y
-	sub
-	push	x
-	push	y
-	mul
-	push	x
-	push	y
-	div
-	push int	5
-	push int	2
-	push int	2
-	div
-	add

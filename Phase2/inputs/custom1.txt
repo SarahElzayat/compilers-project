@@ -9,4 +9,4 @@ def void test (int x,int y)
 
 test(a,b);
 
-int yasmin =2;
+int shokran =2;

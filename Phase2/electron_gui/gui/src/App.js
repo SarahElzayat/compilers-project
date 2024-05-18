@@ -37,6 +37,7 @@ function App() {
           Scope: data[4],
           Initialized: data[5],
           Used: data[6],
+          Function: data[7],
         };
       });
       setSymbolTable(symTableData);

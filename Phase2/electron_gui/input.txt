@@ -1,26 +1,3 @@
 
 int x = 5;
-int y = 5;
-int y1 = 5;
-int y2 = 5;
-int y3 = 5;
-int y4 = 5;
-int y5 = 5;
-int y6 = 5;
-
-# Addition
-print(x+y);
-
-# Subtraction
-print(x-y);
-
-# Multiplication
-print(x*y);
-
-# Division
-print(x/y);
-
-# Values
-print(5+2/2);
-
-#Logic
+int y = -x;

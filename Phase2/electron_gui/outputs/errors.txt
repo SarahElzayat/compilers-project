@@ -1,2 +1,2 @@
-Line 27:  Semantic ERROR: Unused Variable(s) y1 y2 y3 y4 y5 y6 
+Line 3:  Semantic ERROR: Unused Variable(s) y 
 

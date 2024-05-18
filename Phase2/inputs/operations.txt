@@ -20,4 +20,20 @@ print(x%y);
 # Values
 print(5+2/2);
 
+# Negative
+int y = -x;
+
+bool a = true;
+bool b = false;
+#Logic
+print(a and b);
+print(a or b);
+print(not a);
+
+#Comparators
+print(x < y);
+print(x > y);
+print(x <= y);
+print(x <= y);
+print(x != y);
 

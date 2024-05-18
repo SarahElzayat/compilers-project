@@ -94,6 +94,7 @@ Keyword     Description
 %type <nodePtr> declaration_statement  assignment_statement functions
 %type <nodePtr> for_statement for_declaration for_mid_stmt for_assignment   
 %type <nodePtr> while_statement if_statement do_while_statement switch_statement
+%type <nodePtr>  cases default_statement 
 %type <nodePtr>  cases default_statement
 %type <nodePtr> function_declaration parameter_list function_call return_statement comma_expressions 
 %type <intValue> data_type

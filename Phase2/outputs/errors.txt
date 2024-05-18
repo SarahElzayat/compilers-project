@@ -1,1 +1,5 @@
+<<<<<<< Updated upstream
 Line 7:  parse error
+=======
+Line 7:  syntax error
+>>>>>>> Stashed changes

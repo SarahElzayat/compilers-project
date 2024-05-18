@@ -1,17 +1,13 @@
 
 # Declare all types
+#int
 int x = 5;
+#float
 float y = 3.87;
+#string
 string z = " hello world ";
+#bool
 bool is = true;
 
-print(x);
-print(y);
-print(z);
-print(is);
-
-#Declare without initializing
-int a;
-float b; 
-string c; 
-bool d ;
+#constant
+const int x = 100;
