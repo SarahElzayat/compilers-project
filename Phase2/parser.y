@@ -94,7 +94,7 @@ Keyword     Description
 %type <nodePtr> declaration_statement  assignment_statement functions
 %type <nodePtr> for_statement for_declaration for_mid_stmt for_assignment   
 %type <nodePtr> while_statement if_statement do_while_statement switch_statement
-%type <nodePtr> switch_body cases default_statement case_statement
+%type <nodePtr>  cases default_statement
 %type <nodePtr> function_declaration parameter_list function_call return_statement comma_expressions 
 %type <intValue> data_type
 
@@ -166,28 +166,39 @@ if_statement: IF '(' expression ')' '{' statement_list '}' %prec IFX { $$ = cons
             | IF '(' expression ')' '{' statement_list '}' ELSE '{' statement_list '}' { $$ = construct_operation_node(IF, 3, $3, $6, $10); }
             ;
 
-switch_statement: SWITCH '(' expression ')' '{' switch_body '}' { $$ = construct_operation_node(SWITCH, 2, $3, $6); }
-                ;
+//switch_statement: SWITCH '(' expression ')' '{' switch_body '}' { $$ = construct_operation_node(SWITCH, 2, $3, $6); }
+     //           ;
 
-switch_body:
-  cases { /*$$ = construct_operation_node(SWITCH_BODY, 1, $1);*/ }
-  | cases default_statement { /*$$ = construct_operation_node(SWITCH_BODY, 2, $1, $2);*/ }
-  ;
+//switch_body:
+  //cases { /*$$ = construct_operation_node(SWITCH_BODY, 1, $1);*/ }
+  //| cases default_statement { /*$$ = construct_operation_node(SWITCH_BODY, 2, $1, $2);*/ }
+  //;
 
-cases:
-  CASE INTEGER ':' case_statement cases { $$ = construct_operation_node(CASE, 3, construct_constant_node(INTEGER, INT_TYPE, $2), $4, $5); }
-  | CASE BOOL ':' case_statement cases { $$ = construct_operation_node(CASE, 3, construct_constant_node(BOOL, BOOL_TYPE, $2), $4, $5); }
-  | { $$ = construct_operation_node(';', 2, NULL, NULL); }
-  ;
+//cases:
+  //CASE INTEGER ':' case_statement cases { $$ = construct_operation_node(CASE, 3, construct_constant_node(INTEGER, INT_TYPE, $2), $4, $5); }
+  //| CASE BOOL ':' case_statement cases { $$ = construct_operation_node(CASE, 3, construct_constant_node(BOOL, BOOL_TYPE, $2), $4, $5); }
+  //| { $$ = construct_operation_node(';', 2, NULL, NULL); }
+  //;
 
 default_statement:
-  DEFAULT ':' case_statement { $$ = construct_operation_node(DEFAULT, 1, $3); }
+  DEFAULT ':' statement { $$ = construct_operation_node(DEFAULT, 1, $3); }
   ;
 
-case_statement: 
-  statement_list { $$ = $1; }
-  | { $$ = construct_operation_node(';', 2, NULL, NULL); }
-  ;
+//case_statement: 
+  //statement_list { $$ = $1; }
+  //| { $$ = construct_operation_node(';', 2, NULL, NULL); }
+  //;
+
+
+switch_statement :  SWITCH '(' VARIABLE ')' '{' cases '}'                           {$$=construct_operation_node(SWITCH,2,construct_identifier_node($3),$6);}
+                 |  SWITCH '(' VARIABLE ')' '{' cases  default_statement'}'          {$$=construct_operation_node(SWITCH,3,construct_identifier_node($3),$6,$7);}
+                 ;
+
+cases : CASE INTEGER ':' statement BREAK ';' cases                  {$$=construct_operation_node(CASE,4,construct_constant_node(INTEGER,INT_TYPE,$2),$4,construct_operation_node(BREAK,0),$7);}
+      | CASE INTEGER ':' statement  BREAK ';'                {$$=construct_operation_node(CASE,3,construct_constant_node(INTEGER,INT_TYPE,$2),$4,construct_operation_node(BREAK,0));}
+      ;
+
+
 
 for_mid_stmt:
   { $$ = construct_operation_node(';', 2, NULL, NULL); }

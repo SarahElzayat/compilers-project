@@ -1,2 +1,1 @@
-Line 12:  Semantic ERROR: Unused Variable(s) yasmin 
-
+Line 7:  parse error

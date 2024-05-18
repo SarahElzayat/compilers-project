@@ -1,7 +1,14 @@
 int a = 3;
 
-switch(a):
+switch(a)
 {
-    case :
+    case 3 :
+    a=4;
+    break;
+    case 4:
+    a=5;
+    break;
+    default:
+    a=6;
     
 }
