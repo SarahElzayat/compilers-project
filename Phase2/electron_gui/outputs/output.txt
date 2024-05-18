@@ -1,2 +1,3 @@
-	push int	5
-	push	x
+	push int	3
+	push int	3
+	push int	4

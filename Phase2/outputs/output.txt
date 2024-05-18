@@ -1,6 +1,24 @@
 	push int	3
+	pop int	a
+	pop a	
+L001:
+	push	a
 	push int	3
+	compEQ	
+	jz	L002
 	push int	4
+	pop int	a
+	jmp	L11111
+L002:
+	push	a
 	push int	4
+	compEQ	
+	jz	L999
 	push int	5
+	pop int	a
+	jmp	L11111
+L999:
 	push int	6
+	pop int	a
+	jmp	L11111
+L11111:

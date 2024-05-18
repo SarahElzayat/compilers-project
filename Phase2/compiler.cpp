@@ -320,6 +320,8 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
 				// Execute the switch expression
 				switch_var=p->opr.op[0];
 				printf("\tpop %s\t\n",switch_var->id.name);
+        fprintf(assemblyOutFile, "\tpop %s\t\n",switch_var->id.name);
+
 				n=p->opr.op[1];
 				// printf("%d",n->opr.op[2]->opr.nops);
 				while(n->opr.symbol==CASE){
@@ -329,20 +331,34 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
 						last_case=true;
 					}
 					printf("L%03d:\n", l1=label);
+          fprintf(assemblyOutFile, "L%03d:\n", l1);
+
 					printf("\tpush\t%s\n",switch_var->id.name);
-					execute_all(n->opr.op[0]);
+          fprintf(assemblyOutFile, "\tpush\t%s\n",switch_var->id.name);
+
+					execute_all(n->opr.op[0], cont, brk);
 					printf("\tcompEQ\t\n");
+          fprintf(assemblyOutFile, "\tcompEQ\t\n");
+
 					if (last_case){
 						if (p->opr.nops==3){
 							printf("\tjz\tL%03d\n",l1=defaultLabel);
+              fprintf(assemblyOutFile, "\tjz\tL%03d\n",l1);
+
 						}else{
 							printf("\tjz\tL%03d\n",l1=endLabel);
+              fprintf(assemblyOutFile, "\tjz\tL%03d\n",l1);
+
 						}  
 					}else {
 						printf("\tjz\tL%03d\n",l1=++label);
+            fprintf(assemblyOutFile, "\tjz\tL%03d\n",l1);
+
 					}
-					execute_all(n->opr.op[1]);
+					execute_all(n->opr.op[1], cont, brk);
 					printf("\tjmp\tL%03d\n",endLabel);
+          fprintf(assemblyOutFile, "\tjmp\tL%03d\n",endLabel);
+
 					if(last_case){
 						
 						break;
@@ -353,10 +369,14 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
 				}
 				if (p->opr.nops==3){
 					printf("L%03d:\n", l1=defaultLabel);
-					execute_all(p->opr.op[2]->opr.op[0]);
+          fprintf(assemblyOutFile, "L%03d:\n", l1);
+
+					execute_all(p->opr.op[2]->opr.op[0], cont, brk);
 					printf("\tjmp\tL%03d\n",endLabel);
+          fprintf(assemblyOutFile, "\tjmp\tL%03d\n",endLabel);
 				}
 				printf("L%03d:\n", l1=endLabel);
+        fprintf(assemblyOutFile, "L%03d:\n", l1);
 				break;
 
 		/*DO WHILE LOOP*/
@@ -365,13 +385,18 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
 				add_block_scope_level();
 
 				printf("L%03d:\n", l1 = label++); //start
+        fprintf(assemblyOutFile, "L%03d:\n", l1);
+
 				execute_all(p->opr.op[0], l1, l2 = label++);  //body
 				type1 = execute_all(p->opr.op[1]);  //condition
 				if (type1 != BOOL_TYPE) {
 					yyerror("Semantic ERROR: Condition must be of a BOOL value");
 				}
 				printf("\tjnz\tL%03d\n", l1); //if true repeat
+        fprintf(assemblyOutFile, "\tjnz\tL%03d\n", l1);
+
 				printf("L%03d:\n", l2);
+        fprintf(assemblyOutFile, "L%03d:\n", l2);
 
 				remove_block_scope_level();
 				break;
@@ -389,6 +414,7 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
           if (p->opr.op[1]->type == OPERATION && p->opr.op[1]->opr.symbol == '=') // variable assignment
           {
             printf("\tpush\t%s\n", p->opr.op[1]->opr.op[0]->id.name);
+            fprintf(assemblyOutFile, "\tpush\t%s\n", p->opr.op[1]->opr.op[0]->id.name);
           }
           symbolTableEntry = declare_identifier(p->opr.op[0], true);
           if (type1 != symbolTableEntry->type)
@@ -402,18 +428,21 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
           }
           symbolTableEntry->isInitialized = true;
           printf("\tpop %s\t%s\n", get_data_type(symbolTableEntry->type), p->opr.op[0]->id.name);
+          fprintf(assemblyOutFile, "\tpop %s\t%s\n", get_data_type(symbolTableEntry->type), p->opr.op[0]->id.name);
           return symbolTableEntry->type;
 
         case NEGATIVE:
 		    open_file();
             type1 = execute_all(p->opr.op[0]);
             printf("\tneg\n");
+            fprintf(assemblyOutFile, "\tneg\n");
             return type1;
 
         case NOT:
 					open_file();
           type1 = execute_all(p->opr.op[0]);
           printf("\tnot\n");
+          fprintf(assemblyOutFile, "\tnot\n");
           return BOOL_TYPE;
 
         case BREAK:
@@ -424,6 +453,7 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
             break;
           }
           printf("\tjmp\tL%03d\n", brk);
+          fprintf(assemblyOutFile, "\tjmp\tL%03d\n", brk);
           break;
 
         case CONTINUE:
@@ -434,6 +464,7 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
             break;
           }
           printf("\tjmp\tL%03d\n", cont);
+          fprintf(assemblyOutFile, "\tjmp\tL%03d\n", cont);
 
 
         case DEFAULT:
@@ -463,7 +494,7 @@ int execute_all(Node* p, int cont = -1, int brk = -1, int args = 0, ...)
             printf("\tproc\t%s\n",p->opr.op[0]->opr.op[0]->id.name);
             fprintf(assemblyOutFile, "\tproc\t%s\n",p->opr.op[0]->opr.op[0]->id.name);
 
-            printf("func type %s\n",get_data_type(symbolTableEntry->type));
+            // printf("func type %s\n",get_data_type(symbolTableEntry->type));
 
             if(p->opr.op[1]){
               execute_all(p->opr.op[1]);
